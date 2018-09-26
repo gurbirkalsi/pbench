@@ -1,106 +1,120 @@
 import React, { Component } from 'react';
-import axios from 'axios';
+import moment from 'moment';
 import { connect } from 'dva';
 import { routerRedux } from 'dva/router';
-import { Card, Table, Input, Button, Icon } from 'antd';
+import { DatePicker, Card, Table, Input, Button, Icon } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import styles from './Controllers.less';
 
-class Controllers extends Component {
+const { MonthPicker } = DatePicker;
+
+@connect(({ dashboard, loading }) => ({
+  dashboard,
+  loading: loading.effects['dashboard/fetchControllers'],
+}))
+export default class Controllers extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      controllers: [],
       controllerSearch: [],
       loading: false,
       searchText: '',
-      filtered: false
+      filtered: false,
+      startMonth: moment(new Date(), 'YYYY-MM'),
+      endMonth: moment(new Date(), 'YYYY-MM'),
     };
   }
 
   componentDidMount() {
-    this.setState({loading: true});
+    this.handleDateChange();
+  }
 
-    axios.post('http://es-perf44.perf.lab.eng.bos.redhat.com:9280/dsa.pbench.*/_search',
-    {
-      "aggs": {
-        "controllers": {
-          "terms": {
-            "field": "controller",
-            "size": 0,
-            "order": {
-              "runs": "desc"
-            }
-          },
-          "aggs": {
-            "runs": {
-              "min": {
-                "field": "run.start_run"
-              }
-            }
-          }
-        }
-      }
-    }).then(res => {
-      const response = res.data.aggregations.controllers.buckets;
-      var controllers = [];
-      response.map(function(controller) {
-        controllers.push({key: controller.key, controller: controller.key, results: controller.doc_count, last_modified_value: controller.runs.value, last_modified_string: controller.runs.value_as_string});
-      });
-      this.setState({controllers: controllers})
-      this.setState({loading: false})
-    }).catch(error => {
-      console.log(error);
-      this.setState({loading: false});
+  changeStartMonth = month => {
+    this.setState({ startMonth: month }, () => {
+      console.log('setState completed', this.state.startMonth);
+      this.handleDateChange();
     });
-  }
+  };
 
-  onInputChange = (e) => {
+  changeEndMonth = month => {
+    this.setState({ endMonth: month }, () => {
+      console.log('setState completed', this.state.startMonth);
+      this.handleDateChange();
+    });
+  };
+
+  handleDateChange = () => {
+    const { dispatch } = this.props;
+    const { startMonth, endMonth } = this.state;
+
+    dispatch({
+      type: 'dashboard/fetchControllers',
+      payload: [startMonth, endMonth],
+    });
+  };
+
+  disabledDate = current => {
+    return current > moment().endOf('month');
+  };
+
+  onInputChange = e => {
     this.setState({ searchText: e.target.value });
-  }
+  };
 
   onSearch = () => {
-    const { searchText, controllers } = this.state;
+    const { dashboard } = this.props;
+    let { controllers } = dashboard;
+    const { searchText } = this.state;
     const reg = new RegExp(searchText, 'gi');
     var controllerSearch = controllers.slice();
     this.setState({
       filtered: !!searchText,
-      controllerSearch: controllerSearch.map((record) => {
-        const match = record.controller.match(reg);
-        if (!match) {
-          return null;
-        }
-        return {
-          ...record,
-          controller: (
-            <span>
-              {record.controller.split(reg).map((text, i) => (
-                i > 0 ? [<span style={{color: 'orange'}}>{match[0]}</span>, text] : text
-              ))}
-            </span>
-          )
-        }
-      }).filter(record => !!record),
+      controllerSearch: controllerSearch
+        .map(record => {
+          const match = record.controller.match(reg);
+          if (!match) {
+            return null;
+          }
+          return {
+            ...record,
+            controller: (
+              <span>
+                {record.controller
+                  .split(reg)
+                  .map(
+                    (text, i) =>
+                      i > 0 ? [<span style={{ color: 'orange' }}>{match[0]}</span>, text] : text
+                  )}
+              </span>
+            ),
+          };
+        })
+        .filter(record => !!record),
     });
-  }
+  };
 
-  retrieveResults = (params) => {
+  retrieveResults = params => {
     const { dispatch } = this.props;
- 
-    dispatch(routerRedux.push({
-      pathname: '/dashboard/results',
-      state: { controller: params.key }
-    }));
-  }
+
+    dispatch(
+      routerRedux.push({
+        pathname: '/dashboard/results',
+        state: { controller: params.key },
+      })
+    );
+  };
 
   emitEmpty = () => {
     this.searchInput.focus();
     this.setState({ controllerSearch: '' });
-  }
+    this.setState({ searchText: '' });
+  };
 
   render() {
-    const {controllers, controllerSearch, searchText, loading} = this.state;
+    const { controllerSearch, searchText, startMonth, endMonth } = this.state;
+    const { dashboard, loading } = this.props;
+    const { controllers } = dashboard;
 
     const suffix = searchText ? <Icon type="close-circle" onClick={this.emitEmpty} /> : null;
     const columns = [
@@ -108,35 +122,67 @@ class Controllers extends Component {
         title: 'Controller',
         dataIndex: 'controller',
         key: 'controller',
-        sorter: (a, b) => compareByAlph(a.controller, b.controller)
-      }, {
+        sorter: (a, b) => compareByAlph(a.controller, b.controller),
+      },
+      {
         title: 'Last Modified',
         dataIndex: 'last_modified_string',
-        key: 'last_modified_string', 
-        sorter: (a, b) => a.last_modified_value - b.last_modified_value
-      }, {
+        key: 'last_modified_string',
+        sorter: (a, b) => a.last_modified_value - b.last_modified_value,
+      },
+      {
         title: 'Results',
         dataIndex: 'results',
         key: 'results',
-        sorter: (a, b) => a.results - b.results
-      }
+        sorter: (a, b) => a.results - b.results,
+      },
     ];
-    
+
     return (
       <PageHeaderLayout title="Controllers">
         <Card bordered={false}>
-          <Input
-            style={{width: 300, marginRight: 8}}
-            ref={ele => this.searchInput = ele}
-            prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
-            suffix={suffix}
-            placeholder = "Search controllers"
-            value = {this.state.searchText}
-            onChange = {this.onInputChange}
-            onPressEnter = {this.onSearch}
+          <div style={{ flexDirection: 'column' }}>
+            <MonthPicker
+              style={{ marginBottom: 16 }}
+              placeholder={'Start month'}
+              value={startMonth}
+              disabledDate={this.disabledDate}
+              onChange={this.changeStartMonth}
+            />
+            <MonthPicker
+              style={{ marginLeft: 16 }}
+              placeholder={'End month'}
+              value={endMonth}
+              disabledDate={this.disabledDate}
+              onChange={this.changeEndMonth}
+            />
+            <div>
+              <Input
+                style={{ width: 300, marginRight: 8 }}
+                ref={ele => (this.searchInput = ele)}
+                prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                suffix={suffix}
+                placeholder="Search controllers"
+                value={this.state.searchText}
+                onChange={this.onInputChange}
+                onPressEnter={this.onSearch}
+              />
+              <Button type="primary" onClick={this.onSearch}>
+                Search
+              </Button>
+            </div>
+          </div>
+          <Table
+            style={{ marginTop: 20 }}
+            columns={columns}
+            dataSource={controllerSearch.length > 0 ? controllerSearch : controllers}
+            defaultPageSize={20}
+            onRowClick={this.retrieveResults.bind(this)}
+            loading={loading}
+            showSizeChanger={true}
+            showTotal={true}
+            bordered
           />
-          <Button type="primary" onClick={this.onSearch}>Search</Button>
-          <Table style={{marginTop: 20}} columns={columns} dataSource={controllerSearch.length > 0 ? controllerSearch : controllers} defaultPageSize={20} onRowClick={this.retrieveResults.bind(this)} loading={loading} showSizeChanger={true} showTotal={true} bordered/>
         </Card>
       </PageHeaderLayout>
     );
@@ -152,6 +198,3 @@ function compareByAlph(a, b) {
   }
   return 0;
 }
-
-export default connect(() => ({}))(Controllers);
-

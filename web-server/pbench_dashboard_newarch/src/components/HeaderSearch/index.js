@@ -87,13 +87,7 @@ export default class HeaderSearch extends PureComponent {
     return (
       <span className={classNames(className, styles.headerSearch)} onClick={this.enterSearchMode}>
         <Icon type="search" key="Icon" />
-        <AutoComplete
-          key="AutoComplete"
-          {...restProps}
-          className={inputClass}
-          value={value}
-          onChange={this.onChange}
-        >
+        <AutoComplete key="AutoComplete" {...restProps} className={inputClass} value={value}>
           <Input
             placeholder={placeholder}
             ref={node => {
