@@ -28,16 +28,6 @@ for (let i = 0; i < 12; i += 1) {
     y: Math.floor(Math.random() * 1000) + 200,
   });
 }
-const searchData = [];
-for (let i = 0; i < 50; i += 1) {
-  searchData.push({
-    index: i + 1,
-    keyword: `搜索关键词-${i}`,
-    count: Math.floor(Math.random() * 1000),
-    range: Math.floor(Math.random() * 100),
-    status: Math.floor((Math.random() * 10) % 2),
-  });
-}
 const salesTypeData = [
   {
     x: '家用电器',
@@ -183,7 +173,6 @@ export const getFakeChartData = {
   visitData,
   visitData2,
   salesData,
-  searchData,
   offlineData,
   offlineChartData,
   salesTypeData,
