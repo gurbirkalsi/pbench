@@ -8,8 +8,10 @@ import styles from './Controllers.less';
 
 const { MonthPicker } = DatePicker;
 
-@connect(({ dashboard, loading }) => ({
+@connect(({ dashboard, global = {}, loading }) => ({
   dashboard,
+  startMonth: global.startMonth,
+  endMonth: global.endMonth,
   loading: loading.effects['dashboard/fetchControllers'],
 }))
 export default class Controllers extends Component {
@@ -20,9 +22,7 @@ export default class Controllers extends Component {
       controllerSearch: [],
       loading: false,
       searchText: '',
-      filtered: false,
-      startMonth: moment(new Date(), 'YYYY-MM'),
-      endMonth: moment(new Date(), 'YYYY-MM'),
+      filtered: false
     };
   }
 
@@ -30,23 +30,42 @@ export default class Controllers extends Component {
     this.handleDateChange();
   }
 
-  changeStartMonth = month => {
-    this.setState({ startMonth: month }, () => {
-      console.log('setState completed', this.state.startMonth);
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.props.startMonth != nextProps.startMonth 
+      || this.props.endMonth != nextProps.endMonth
+      || this.props.dashboard.controllers != nextProps.dashboard.controllers
+      || this.props.loading != nextProps.loading
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  changeStartMonth = (month) => {
+    const { dispatch } = this.props;
+
+    dispatch({
+      type: 'global/updateControllerStartMonth',
+      payload: month,
+    }).then((data) => {
       this.handleDateChange();
-    });
+    })
   };
 
-  changeEndMonth = month => {
-    this.setState({ endMonth: month }, () => {
-      console.log('setState completed', this.state.startMonth);
+  changeEndMonth = (month) => {
+    const { dispatch } = this.props;
+
+    dispatch({
+      type: 'global/updateControllerEndMonth',
+      payload: month,
+    }).then((data) => {
       this.handleDateChange();
-    });
+    })
   };
 
   handleDateChange = () => {
-    const { dispatch } = this.props;
-    const { startMonth, endMonth } = this.state;
+    const { dispatch, startMonth, endMonth } = this.props;
 
     dispatch({
       type: 'dashboard/fetchControllers',
@@ -112,8 +131,8 @@ export default class Controllers extends Component {
   };
 
   render() {
-    const { controllerSearch, searchText, startMonth, endMonth } = this.state;
-    const { dashboard, loading } = this.props;
+    const { controllerSearch, searchText } = this.state;
+    const { dashboard, startMonth, endMonth, loading } = this.props;
     const { controllers } = dashboard;
 
     const suffix = searchText ? <Icon type="close-circle" onClick={this.emitEmpty} /> : null;
@@ -148,17 +167,22 @@ export default class Controllers extends Component {
               value={startMonth}
               disabledDate={this.disabledDate}
               onChange={this.changeStartMonth}
+              renderExtraFooter={() => 'Select the start month to adjust the time range for controllers to query.'}
             />
             <MonthPicker
-              style={{ marginLeft: 16 }}
+              style={{ marginLeft: 16, marginRight: 8 }}
               placeholder={'End month'}
               value={endMonth}
               disabledDate={this.disabledDate}
               onChange={this.changeEndMonth}
+              renderExtraFooter={() => 'Select the end month to adjust the time range for controllers to query.'}
             />
+            <Button type="primary" onClick={this.handleDateChange}>
+              {'Filter'}
+            </Button>
             <div>
               <Input
-                style={{ width: 300, marginRight: 8 }}
+                style={{ width: 300, marginRight: 8 }}  
                 ref={ele => (this.searchInput = ele)}
                 prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
                 suffix={suffix}

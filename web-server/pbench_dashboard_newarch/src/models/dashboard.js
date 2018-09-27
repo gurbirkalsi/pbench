@@ -33,14 +33,7 @@ export default {
         type: 'getControllers',
         payload: controllers,
       });
-    },
-    *fetchCurrent(_, { call, put }) {
-      const response = yield call(queryCurrent);
-      yield put({
-        type: 'saveCurrentUser',
-        payload: response,
-      });
-    },
+    }
   },
 
   reducers: {
@@ -48,21 +41,6 @@ export default {
       return {
         ...state,
         controllers: payload,
-      };
-    },
-    saveCurrentUser(state, action) {
-      return {
-        ...state,
-        currentUser: action.payload || {},
-      };
-    },
-    changeNotifyCount(state, action) {
-      return {
-        ...state,
-        currentUser: {
-          ...state.currentUser,
-          notifyCount: action.payload,
-        },
       };
     },
   },
