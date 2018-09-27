@@ -1,34 +1,27 @@
-import { queryNotices } from '../services/api';
+import moment from 'moment';
+
+const defaultMonth = moment(new Date(), 'YYYY-MM');
 
 export default {
   namespace: 'global',
 
   state: {
     collapsed: false,
-    notices: [],
+    startMonth: defaultMonth,
+    endMonth: defaultMonth
   },
 
   effects: {
-    *fetchNotices(_, { call, put }) {
-      const data = yield call(queryNotices);
+    *updateControllerStartMonth({ payload }, { select, put }) {
       yield put({
-        type: 'saveNotices',
-        payload: data,
-      });
-      yield put({
-        type: 'user/changeNotifyCount',
-        payload: data.length,
+        type: 'modifyControllerStartMonth',
+        payload: payload,
       });
     },
-    *clearNotices({ payload }, { put, select }) {
+    *updateControllerEndMonth({ payload }, { select, put }) {
       yield put({
-        type: 'saveClearedNotices',
-        payload,
-      });
-      const count = yield select(state => state.global.notices.length);
-      yield put({
-        type: 'user/changeNotifyCount',
-        payload: count,
+        type: 'modifyControllerEndMonth',
+        payload: payload,
       });
     },
   },
@@ -40,18 +33,18 @@ export default {
         collapsed: payload,
       };
     },
-    saveNotices(state, { payload }) {
+    modifyControllerStartMonth(state, { payload }) {
+      return { 
+        ...state,
+        startMonth: payload
+      }
+    },
+    modifyControllerEndMonth(state, { payload }) {
       return {
         ...state,
-        notices: payload,
-      };
-    },
-    saveClearedNotices(state, { payload }) {
-      return {
-        ...state,
-        notices: state.notices.filter(item => item.type !== payload),
-      };
-    },
+        endMonth: payload
+      }
+    }
   },
 
   subscriptions: {
