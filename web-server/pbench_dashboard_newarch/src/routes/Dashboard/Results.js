@@ -1,24 +1,25 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import axios from 'axios';
 import { connect } from 'dva';
 import { routerRedux } from 'dva/router';
+import moment from 'moment';
 import { Tag, Card, Table, Input, Button } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
-import styles from './Results.less';
 
-class Results extends Component {
-  static propTypes = {
-    controller: PropTypes.string,
-  };
-
+@connect(({ dashboard, loading }) => ({
+  results: dashboard.results,
+  selectedController: dashboard.selectedController,
+  startMonth: dashboard.startMonth,
+  endMonth: dashboard.endMonth,
+  loading: loading.effects['dashboard/fetchResults'],
+}))
+export default class Results extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      results: [],
       resultSearch: [],
       selectedRowKeys: [],
+      selectedRowNames: [],
       loading: false,
       loadingButton: false,
       searchText: '',
@@ -27,44 +28,16 @@ class Results extends Component {
   }
 
   componentDidMount() {
-    this.setState({ loading: true });
-    const { controller } = this.props.location.state;
+    const { dispatch, startMonth, endMonth, selectedController } = this.props;
 
-    axios
-      .post('http://es-perf44.perf.lab.eng.bos.redhat.com:9280/_search', {
-        fields: ['run.controller', 'run.start_run', 'run.end_run', 'run.name', 'run.config'],
-        sort: {
-          'run.end_run': {
-            order: 'desc',
-            ignore_unmapped: true,
-          },
-        },
-        query: {
-          term: {
-            'run.controller': controller,
-          },
-        },
-        size: 5000,
-      })
-      .then(res => {
-        var res = res.data.hits.hits;
-        var results = [];
-        for (var response in res) {
-          results.push({
-            result: res[response].fields['run.name'][0],
-            config: res[response].fields['run.config'][0],
-            startRunUnixTimestamp: Date.parse(res[response].fields['run.start_run'][0]),
-            startRun: res[response].fields['run.start_run'][0],
-            endRun: res[response].fields['run.end_run'][0],
-          });
-        }
-        this.setState({ results: results });
-        this.setState({ loading: false });
-      })
-      .catch(error => {
-        console.log(error);
-        this.setState({ loading: false });
-      });
+    dispatch({
+      type: 'dashboard/fetchResults',
+      payload: {
+        startMonth: moment(startMonth),
+        endMonth: moment(endMonth),
+        controller: selectedController,
+      },
+    });
   }
 
   start = () => {
@@ -85,19 +58,29 @@ class Results extends Component {
   };
 
   onCompareResults = () => {
-    const { selectedRowKeys, results } = this.state;
-    const { controller } = this.props.location.state;
+    const { selectedRowKeys } = this.state;
+    const { selectedController, results } = this.props;
     var selectedResults = [];
     for (var item in selectedRowKeys) {
       var result = results[selectedRowKeys[item]];
-      result['controller'] = controller;
+      result['controller'] = selectedController;
       selectedResults.push(results[selectedRowKeys[item]]);
     }
     this.compareResults(selectedResults);
   };
 
   onSelectChange = selectedRowKeys => {
+    const { dispatch, results } = this.props;
+    let selectedRowNames = [];
+    selectedRowKeys.map(row => {
+      selectedRowNames.push(results[row]);
+    });
     this.setState({ selectedRowKeys });
+
+    dispatch({
+      type: 'dashboard/updateSelectedResults',
+      payload: selectedRowNames,
+    });
   };
 
   onInputChange = e => {
@@ -105,7 +88,8 @@ class Results extends Component {
   };
 
   onSearch = () => {
-    const { searchText, results } = this.state;
+    const { searchText } = this.state;
+    const { results } = this.props;
     const reg = new RegExp(searchText, 'gi');
     var resultSearch = results.slice();
     this.setState({
@@ -140,32 +124,28 @@ class Results extends Component {
     dispatch(
       routerRedux.push({
         pathname: '/dashboard/comparison-select',
-        state: {
-          results: params,
-          controller: this.props.location.state.controller,
-        },
       })
     );
   };
 
-  retrieveResults(params) {
+  retrieveResults = params => {
     const { dispatch } = this.props;
+
+    dispatch({
+      type: 'dashboard/updateSelectedResults',
+      payload: [params.result],
+    });
 
     dispatch(
       routerRedux.push({
         pathname: '/dashboard/summary',
-        state: {
-          result: params.result,
-          controller: this.props.location.state.controller,
-        },
       })
     );
-  }
+  };
 
   render() {
-    const { resultSearch, loading, loadingButton, selectedRowKeys } = this.state;
-    const { controller } = this.props.location.state;
-    var { results } = this.state;
+    const { resultSearch, loadingButton, selectedRowKeys } = this.state;
+    const { selectedController, results, loading } = this.props;
     const rowSelection = {
       selectedRowKeys,
       onChange: this.onSelectChange,
@@ -203,7 +183,7 @@ class Results extends Component {
     ];
 
     return (
-      <PageHeaderLayout title={controller}>
+      <PageHeaderLayout title={selectedController}>
         <Card bordered={false}>
           <Input
             style={{ width: 300, marginRight: 8, marginTop: 16 }}
@@ -214,7 +194,7 @@ class Results extends Component {
             onPressEnter={this.onSearch}
           />
           <Button type="primary" onClick={this.onSearch}>
-            Search
+            {'Search'}
           </Button>
           {selectedRowKeys.length > 0 ? (
             <Card
@@ -227,7 +207,7 @@ class Results extends Component {
                   disabled={!hasSelected}
                   loading={loadingButton}
                 >
-                  Compare Results
+                  {'Compare Results'}
                 </Button>
               }
               hoverable={false}
@@ -264,5 +244,3 @@ function compareByAlph(a, b) {
   }
   return 0;
 }
-
-export default connect(() => ({}))(Results);

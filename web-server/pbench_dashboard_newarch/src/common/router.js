@@ -75,21 +75,29 @@ export const getRouterData = app => {
       component: dynamicWrapper(app, ['user', 'login'], () => import('../layouts/BasicLayout')),
     },
     '/dashboard/controllers': {
-      component: dynamicWrapper(app, ['dashboard'], () =>
+      component: dynamicWrapper(app, ['dashboard', 'global'], () =>
         import('../routes/Dashboard/Controllers')
       ),
     },
     '/dashboard/results': {
-      component: dynamicWrapper(app, [], () => import('../routes/Dashboard/Results')),
+      component: dynamicWrapper(app, ['dashboard', 'global'], () =>
+        import('../routes/Dashboard/Results')
+      ),
     },
     '/dashboard/summary': {
-      component: dynamicWrapper(app, [], () => import('../routes/Dashboard/Summary')),
+      component: dynamicWrapper(app, ['dashboard', 'global'], () =>
+        import('../routes/Dashboard/Summary')
+      ),
     },
     '/dashboard/comparison-select': {
-      component: dynamicWrapper(app, [], () => import('../routes/Dashboard/ComparisonSelect')),
+      component: dynamicWrapper(app, ['dashboard', 'global'], () =>
+        import('../routes/Dashboard/ComparisonSelect')
+      ),
     },
     '/dashboard/comparison': {
-      component: dynamicWrapper(app, [], () => import('../routes/Dashboard/RunComparison')),
+      component: dynamicWrapper(app, ['dashboard', 'global'], () =>
+        import('../routes/Dashboard/RunComparison')
+      ),
     },
     '/dashboard/analysis': {
       component: dynamicWrapper(app, ['chart'], () => import('../routes/Dashboard/Analysis')),

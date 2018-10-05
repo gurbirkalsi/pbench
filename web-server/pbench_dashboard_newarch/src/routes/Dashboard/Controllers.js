@@ -1,17 +1,14 @@
 import React, { Component } from 'react';
-import moment from 'moment';
 import { connect } from 'dva';
 import { routerRedux } from 'dva/router';
-import { DatePicker, Card, Table, Input, Button, Icon } from 'antd';
+import moment from 'moment';
+import { Card, Table, Input, Button, Icon } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
-import styles from './Controllers.less';
 
-const { MonthPicker } = DatePicker;
-
-@connect(({ dashboard, global = {}, loading }) => ({
-  dashboard,
-  startMonth: global.startMonth,
-  endMonth: global.endMonth,
+@connect(({ dashboard, loading }) => ({
+  controllers: dashboard.controllers,
+  startMonth: dashboard.startMonth,
+  endMonth: dashboard.endMonth,
   loading: loading.effects['dashboard/fetchControllers'],
 }))
 export default class Controllers extends Component {
@@ -20,9 +17,8 @@ export default class Controllers extends Component {
 
     this.state = {
       controllerSearch: [],
-      loading: false,
       searchText: '',
-      filtered: false
+      filtered: false,
     };
   }
 
@@ -30,51 +26,13 @@ export default class Controllers extends Component {
     this.handleDateChange();
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (this.props.startMonth != nextProps.startMonth 
-      || this.props.endMonth != nextProps.endMonth
-      || this.props.dashboard.controllers != nextProps.dashboard.controllers
-      || this.props.loading != nextProps.loading
-    ) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  changeStartMonth = (month) => {
-    const { dispatch } = this.props;
-
-    dispatch({
-      type: 'global/updateControllerStartMonth',
-      payload: month,
-    }).then((data) => {
-      this.handleDateChange();
-    })
-  };
-
-  changeEndMonth = (month) => {
-    const { dispatch } = this.props;
-
-    dispatch({
-      type: 'global/updateControllerEndMonth',
-      payload: month,
-    }).then((data) => {
-      this.handleDateChange();
-    })
-  };
-
   handleDateChange = () => {
     const { dispatch, startMonth, endMonth } = this.props;
 
     dispatch({
       type: 'dashboard/fetchControllers',
-      payload: [startMonth, endMonth],
+      payload: { startMonth: moment(startMonth), endMonth: moment(endMonth) },
     });
-  };
-
-  disabledDate = current => {
-    return current > moment().endOf('month');
   };
 
   onInputChange = e => {
@@ -82,8 +40,7 @@ export default class Controllers extends Component {
   };
 
   onSearch = () => {
-    const { dashboard } = this.props;
-    let { controllers } = dashboard;
+    const { controllers } = this.props;
     const { searchText } = this.state;
     const reg = new RegExp(searchText, 'gi');
     var controllerSearch = controllers.slice();
@@ -116,12 +73,16 @@ export default class Controllers extends Component {
   retrieveResults = params => {
     const { dispatch } = this.props;
 
-    dispatch(
-      routerRedux.push({
-        pathname: '/dashboard/results',
-        state: { controller: params.key },
-      })
-    );
+    dispatch({
+      type: 'dashboard/updateSelectedController',
+      payload: params.key,
+    }).then(() => {
+      dispatch(
+        routerRedux.push({
+          pathname: '/dashboard/results',
+        })
+      );
+    });
   };
 
   emitEmpty = () => {
@@ -132,9 +93,7 @@ export default class Controllers extends Component {
 
   render() {
     const { controllerSearch, searchText } = this.state;
-    const { dashboard, startMonth, endMonth, loading } = this.props;
-    const { controllers } = dashboard;
-
+    const { controllers, loading } = this.props;
     const suffix = searchText ? <Icon type="close-circle" onClick={this.emitEmpty} /> : null;
     const columns = [
       {
@@ -161,28 +120,9 @@ export default class Controllers extends Component {
       <PageHeaderLayout title="Controllers">
         <Card bordered={false}>
           <div style={{ flexDirection: 'column' }}>
-            <MonthPicker
-              style={{ marginBottom: 16 }}
-              placeholder={'Start month'}
-              value={startMonth}
-              disabledDate={this.disabledDate}
-              onChange={this.changeStartMonth}
-              renderExtraFooter={() => 'Select the start month to adjust the time range for controllers to query.'}
-            />
-            <MonthPicker
-              style={{ marginLeft: 16, marginRight: 8 }}
-              placeholder={'End month'}
-              value={endMonth}
-              disabledDate={this.disabledDate}
-              onChange={this.changeEndMonth}
-              renderExtraFooter={() => 'Select the end month to adjust the time range for controllers to query.'}
-            />
-            <Button type="primary" onClick={this.handleDateChange}>
-              {'Filter'}
-            </Button>
             <div>
               <Input
-                style={{ width: 300, marginRight: 8 }}  
+                style={{ width: 300, marginRight: 8 }}
                 ref={ele => (this.searchInput = ele)}
                 prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
                 suffix={suffix}
