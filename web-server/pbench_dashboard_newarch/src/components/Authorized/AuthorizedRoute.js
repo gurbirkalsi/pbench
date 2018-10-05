@@ -1,8 +1,8 @@
-import React from 'react';
+import ReactJS from 'react';
 import { Route, Redirect } from 'react-router-dom';
 import Authorized from 'components/Authorized/Authorized';
 
-class AuthorizedRoute extends React.Component {
+class AuthorizedRoute extends ReactJS.Component {
   render() {
     const { component: Component, render, authority, redirectPath, ...rest } = this.props;
     return (

@@ -22,7 +22,7 @@ Ant Design Pro 提供的业务中常用的图表类型，都是基于 [G2](https
 | total | 数据总量 | ReactNode \| number \| function | - |
 | footer | 卡片底部 | ReactNode | - |
 | contentHeight | 内容区域高度 | number | - |
-| avatar | 右侧图标 | React.ReactNode | - |
+| avatar | 右侧图标 | ReactJS.ReactNode | - |
 ### MiniBar
 
 | 参数      | 说明                                      | 类型         | 默认值 |

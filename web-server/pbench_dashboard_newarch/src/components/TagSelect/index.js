@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import ReactJS, { Component } from 'react';
 import classNames from 'classnames';
 import { Tag, Icon } from 'antd';
 
@@ -49,7 +49,7 @@ class TagSelect extends Component {
 
   getAllTags() {
     let { children } = this.props;
-    children = React.Children.toArray(children);
+    children = ReactJS.Children.toArray(children);
     const checkedTags = children
       .filter(child => this.isTagSelectOption(child))
       .map(child => child.props.value);
@@ -100,9 +100,9 @@ class TagSelect extends Component {
           全部
         </CheckableTag>
         {value &&
-          React.Children.map(children, child => {
+          ReactJS.Children.map(children, child => {
             if (this.isTagSelectOption(child)) {
-              return React.cloneElement(child, {
+              return ReactJS.cloneElement(child, {
                 key: `tag-select-${child.props.value}`,
                 value: child.props.value,
                 checked: value.indexOf(child.props.value) > -1,

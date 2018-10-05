@@ -1,4 +1,4 @@
-import React from 'react';
+import ReactJS from 'react';
 import { Chart, Tooltip, Geom, Legend, Axis } from 'bizcharts';
 import DataSet from '@antv/data-set';
 import Slider from 'bizcharts-plugin-slider';
@@ -6,7 +6,7 @@ import autoHeight from 'components/Charts/autoHeight';
 import styles from './index.less';
 
 @autoHeight()
-export default class TimelineChart extends React.Component {
+export default class TimelineChart extends ReactJS.Component {
   render() {
     const {
       title,

@@ -1,11 +1,11 @@
-import * as React from 'react';
+import * as ReactJS from 'react';
 export interface IGaugeProps {
-  title: React.ReactNode;
+  title: ReactJS.ReactNode;
   color?: string;
   height: number;
   bgColor?: number;
   percent: number;
-  style?: React.CSSProperties;
+  style?: ReactJS.CSSProperties;
 }
 
-export default class Gauge extends React.Component<IGaugeProps, any> {}
+export default class Gauge extends ReactJS.Component<IGaugeProps, any> {}

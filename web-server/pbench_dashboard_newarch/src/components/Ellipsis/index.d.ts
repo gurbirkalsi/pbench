@@ -1,11 +1,11 @@
-import * as React from 'react';
+import * as ReactJS from 'react';
 export interface IEllipsisProps {
   tooltip?: boolean;
   length?: number;
   lines?: number;
-  style?: React.CSSProperties;
+  style?: ReactJS.CSSProperties;
   className?: string;
   fullWidthRecognition?: boolean;
 }
 
-export default class Ellipsis extends React.Component<IEllipsisProps, any> {}
+export default class Ellipsis extends ReactJS.Component<IEllipsisProps, any> {}

@@ -1,10 +1,10 @@
-import * as React from 'react';
+import * as ReactJS from 'react';
 export interface IMiniProgressProps {
   target: number;
   color?: string;
   strokeWidth?: number;
   percent?: number;
-  style?: React.CSSProperties;
+  style?: ReactJS.CSSProperties;
 }
 
-export default class MiniProgress extends React.Component<IMiniProgressProps, any> {}
+export default class MiniProgress extends ReactJS.Component<IMiniProgressProps, any> {}

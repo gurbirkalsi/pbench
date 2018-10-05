@@ -1,10 +1,10 @@
-import * as React from 'react';
+import * as ReactJS from 'react';
 
 export interface ITrendProps {
   colorful?: boolean;
   flag: 'up' | 'down';
-  style?: React.CSSProperties;
+  style?: ReactJS.CSSProperties;
   reverseColor?: boolean;
 }
 
-export default class Trend extends React.Component<ITrendProps, any> {}
+export default class Trend extends ReactJS.Component<ITrendProps, any> {}

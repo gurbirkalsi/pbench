@@ -1,4 +1,4 @@
-import React from 'react';
+import ReactJS from 'react';
 import { Link } from 'dva/router';
 import Exception from 'components/Exception';
 

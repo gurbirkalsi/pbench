@@ -1,20 +1,20 @@
-import * as React from 'react';
+import * as ReactJS from 'react';
 export interface IPageHeaderProps {
-  title?: React.ReactNode | string;
-  logo?: React.ReactNode | string;
-  action?: React.ReactNode | string;
-  content?: React.ReactNode;
-  extraContent?: React.ReactNode;
+  title?: ReactJS.ReactNode | string;
+  logo?: ReactJS.ReactNode | string;
+  action?: ReactJS.ReactNode | string;
+  content?: ReactJS.ReactNode;
+  extraContent?: ReactJS.ReactNode;
   routes?: any[];
   params?: any;
-  breadcrumbList?: Array<{ title: React.ReactNode; href?: string }>;
-  tabList?: Array<{ key: string; tab: React.ReactNode }>;
+  breadcrumbList?: Array<{ title: ReactJS.ReactNode; href?: string }>;
+  tabList?: Array<{ key: string; tab: ReactJS.ReactNode }>;
   tabActiveKey?: string;
   tabDefaultActiveKey?: string;
   onTabChange?: (key: string) => void;
-  tabBarExtraContent?: React.ReactNode;
-  linkElement?: React.ReactNode;
-  style?: React.CSSProperties;
+  tabBarExtraContent?: ReactJS.ReactNode;
+  linkElement?: ReactJS.ReactNode;
+  style?: ReactJS.CSSProperties;
 }
 
-export default class PageHeader extends React.Component<IPageHeaderProps, any> {}
+export default class PageHeader extends ReactJS.Component<IPageHeaderProps, any> {}

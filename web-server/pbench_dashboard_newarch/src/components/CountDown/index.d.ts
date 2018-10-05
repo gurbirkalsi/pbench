@@ -1,9 +1,9 @@
-import * as React from 'react';
+import * as ReactJS from 'react';
 export interface ICountDownProps {
   format?: (time: number) => void;
   target: Date | number;
   onEnd?: () => void;
-  style?: React.CSSProperties;
+  style?: ReactJS.CSSProperties;
 }
 
-export default class CountDown extends React.Component<ICountDownProps, any> {}
+export default class CountDown extends ReactJS.Component<ICountDownProps, any> {}

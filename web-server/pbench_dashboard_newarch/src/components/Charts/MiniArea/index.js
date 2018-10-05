@@ -1,10 +1,10 @@
-import React from 'react';
+import ReactJS from 'react';
 import { Chart, Axis, Tooltip, Geom } from 'bizcharts';
 import autoHeight from 'components/Charts/autoHeight';
 import styles from '../index.less';
 
 @autoHeight()
-export default class MiniArea extends React.Component {
+export default class MiniArea extends ReactJS.Component {
   render() {
     const {
       height,

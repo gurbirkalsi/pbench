@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import ReactJS, { PureComponent } from 'react';
 import { Input, Icon } from 'antd';
 import styles from './index.less';
 

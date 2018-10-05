@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as ReactJS from 'react';
 
 // g2已经更新到3.0
 // 不带的写了
@@ -26,4 +26,4 @@ export interface IMiniAreaProps {
   }>;
 }
 
-export default class MiniArea extends React.Component<IMiniAreaProps, any> {}
+export default class MiniArea extends ReactJS.Component<IMiniAreaProps, any> {}

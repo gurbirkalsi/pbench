@@ -1,9 +1,9 @@
-import React from 'react';
+import ReactJS from 'react';
 import { Chart, Tooltip, Geom, Legend, Axis } from 'bizcharts';
 import DataSet from '@antv/data-set';
 import Slider from 'bizcharts-plugin-slider';
 
-class Timeseries extends React.Component {
+class Timeseries extends ReactJS.Component {
   render() {
     const {
       title,

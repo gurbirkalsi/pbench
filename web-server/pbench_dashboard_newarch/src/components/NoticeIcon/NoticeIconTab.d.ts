@@ -1,19 +1,19 @@
-import * as React from 'react';
+import * as ReactJS from 'react';
 export interface INoticeIconData {
   avatar?: string;
-  title?: React.ReactNode;
-  description?: React.ReactNode;
-  datetime?: React.ReactNode;
-  extra?: React.ReactNode;
-  style?: React.CSSProperties;
+  title?: ReactJS.ReactNode;
+  description?: ReactJS.ReactNode;
+  datetime?: ReactJS.ReactNode;
+  extra?: ReactJS.ReactNode;
+  style?: ReactJS.CSSProperties;
 }
 
 export interface INoticeIconTabProps {
   list?: INoticeIconData[];
   title?: string;
-  emptyText?: React.ReactNode;
+  emptyText?: ReactJS.ReactNode;
   emptyImage?: string;
-  style?: React.CSSProperties;
+  style?: ReactJS.CSSProperties;
 }
 
-export default class NoticeIconTab extends React.Component<INoticeIconTabProps, any> {}
+export default class NoticeIconTab extends ReactJS.Component<INoticeIconTabProps, any> {}

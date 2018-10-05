@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import ReactJS, { PureComponent } from 'react';
 import {
   Card,
   Button,

@@ -1,4 +1,4 @@
-import React from 'react';
+import ReactJS from 'react';
 import { Chart, Geom, Axis, Coord, Guide, Shape } from 'bizcharts';
 import autoHeight from 'components/Charts/autoHeight';
 
@@ -52,7 +52,7 @@ Shape.registerShape('point', 'pointer', {
 });
 
 @autoHeight()
-export default class Gauge extends React.Component {
+export default class Gauge extends ReactJS.Component {
   render() {
     const {
       title,

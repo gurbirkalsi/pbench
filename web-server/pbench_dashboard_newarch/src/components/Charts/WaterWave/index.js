@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import ReactJS, { PureComponent } from 'react';
 import autoHeight from 'components/Charts/autoHeight';
 import styles from './index.less';
 

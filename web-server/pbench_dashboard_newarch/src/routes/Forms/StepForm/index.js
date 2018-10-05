@@ -1,4 +1,4 @@
-import React, { PureComponent, Fragment } from 'react';
+import ReactJS, { PureComponent, Fragment } from 'react';
 import { Route, Redirect, Switch } from 'dva/router';
 import { Card, Steps } from 'antd';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';

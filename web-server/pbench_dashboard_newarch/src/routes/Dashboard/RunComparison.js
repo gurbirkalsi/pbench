@@ -1,4 +1,4 @@
-import React from 'react';
+import ReactJS from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { Row, Col, Card, Select, Tabs, Spin, Modal, Tag, Table, Button } from 'antd';
@@ -12,7 +12,7 @@ import axios from 'axios';
 const { Description } = DescriptionList;
 const TabPane = Tabs.TabPane;
 
-class RunComparison extends React.Component {
+class RunComparison extends ReactJS.Component {
   static propTypes = {
     iterations: PropTypes.array,
     configCategories: PropTypes.array,

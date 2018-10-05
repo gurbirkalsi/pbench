@@ -1,13 +1,13 @@
-import * as React from 'react';
+import * as ReactJS from 'react';
 export interface IGlobalFooterProps {
   links?: Array<{
     key?: string;
-    title: React.ReactNode;
+    title: ReactJS.ReactNode;
     href: string;
     blankTarget?: boolean;
   }>;
-  copyright?: React.ReactNode;
-  style?: React.CSSProperties;
+  copyright?: ReactJS.ReactNode;
+  style?: ReactJS.CSSProperties;
 }
 
-export default class GlobalFooter extends React.Component<IGlobalFooterProps, any> {}
+export default class GlobalFooter extends ReactJS.Component<IGlobalFooterProps, any> {}

@@ -1,4 +1,4 @@
-import React from 'react';
+import ReactJS from 'react';
 import { routerRedux, Route, Switch } from 'dva/router';
 import { LocaleProvider } from 'antd';
 import enUS from 'antd/lib/locale-provider/en_US';

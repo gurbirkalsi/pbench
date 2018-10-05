@@ -1,11 +1,11 @@
-import * as React from 'react';
+import * as ReactJS from 'react';
 export interface ITagCloudProps {
   data: Array<{
     name: string;
     value: number;
   }>;
   height: number;
-  style?: React.CSSProperties;
+  style?: ReactJS.CSSProperties;
 }
 
-export default class TagCloud extends React.Component<ITagCloudProps, any> {}
+export default class TagCloud extends ReactJS.Component<ITagCloudProps, any> {}

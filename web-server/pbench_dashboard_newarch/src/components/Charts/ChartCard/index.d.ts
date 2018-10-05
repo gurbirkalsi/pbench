@@ -1,12 +1,12 @@
-import * as React from 'react';
+import * as ReactJS from 'react';
 export interface IChartCardProps {
-  title: React.ReactNode;
-  action?: React.ReactNode;
-  total?: React.ReactNode | number | (() => React.ReactNode | number);
-  footer?: React.ReactNode;
+  title: ReactJS.ReactNode;
+  action?: ReactJS.ReactNode;
+  total?: ReactJS.ReactNode | number | (() => ReactJS.ReactNode | number);
+  footer?: ReactJS.ReactNode;
   contentHeight?: number;
-  avatar?: React.ReactNode;
-  style?: React.CSSProperties;
+  avatar?: ReactJS.ReactNode;
+  style?: ReactJS.CSSProperties;
 }
 
-export default class ChartCard extends React.Component<IChartCardProps, any> {}
+export default class ChartCard extends ReactJS.Component<IChartCardProps, any> {}

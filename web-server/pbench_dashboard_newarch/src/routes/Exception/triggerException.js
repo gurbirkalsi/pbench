@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import ReactJS, { PureComponent } from 'react';
 import { Button, Spin, Card } from 'antd';
 import { connect } from 'dva';
 import styles from './style.less';

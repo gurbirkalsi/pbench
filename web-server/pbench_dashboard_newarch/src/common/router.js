@@ -1,4 +1,4 @@
-import React, { createElement } from 'react';
+import ReactJS, { createElement } from 'react';
 import { Spin } from 'antd';
 import pathToRegexp from 'path-to-regexp';
 import Loadable from 'react-loadable';

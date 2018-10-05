@@ -1,4 +1,4 @@
-import React from 'react';
+import ReactJS from 'react';
 import { connect } from 'dva';
 import { routerRedux } from 'dva/router';
 import moment from 'moment';
@@ -32,7 +32,7 @@ const tabList = [
   endMonth: dashboard.endMonth,
   controllers: dashboard.controllers,
 }))
-class Summary extends React.Component {
+class Summary extends ReactJS.Component {
   constructor(props) {
     super(props);
 

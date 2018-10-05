@@ -1,4 +1,4 @@
-import React from 'react';
+import ReactJS from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { Col } from 'antd';

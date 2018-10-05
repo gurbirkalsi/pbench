@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import ReactJS, { Component, Fragment } from 'react';
 import moment from 'moment';
 import { connect } from 'dva';
 import { Form, Card, Select, List, Tag, Icon, Avatar, Row, Col, Button } from 'antd';

@@ -1,12 +1,12 @@
-import React from 'react';
+import ReactJS from 'react';
 import { Tooltip, Avatar } from 'antd';
 import classNames from 'classnames';
 
 import styles from './index.less';
 
 const AvatarList = ({ children, size, ...other }) => {
-  const childrenWithProps = React.Children.map(children, child =>
-    React.cloneElement(child, {
+  const childrenWithProps = ReactJS.Children.map(children, child =>
+    ReactJS.cloneElement(child, {
       size,
     })
   );

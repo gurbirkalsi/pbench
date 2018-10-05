@@ -14,7 +14,7 @@ import { Alert } from 'antd';
 const { Secured } = RenderAuthorized('user');
 
 @Secured('admin')
-class TestSecuredString extends React.Component {
+class TestSecuredString extends ReactJS.Component {
   render() {
     <Alert message="user Passed!" type="success" showIcon />;
   }

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as ReactJS from 'react';
 export interface IPieProps {
   animate?: boolean;
   color?: string;
@@ -10,11 +10,11 @@ export interface IPieProps {
     x: string | string;
     y: number;
   }>;
-  total?: React.ReactNode | number | (() => React.ReactNode | number);
-  title?: React.ReactNode;
+  total?: ReactJS.ReactNode | number | (() => ReactJS.ReactNode | number);
+  title?: ReactJS.ReactNode;
   tooltip?: boolean;
-  valueFormat?: (value: string) => string | React.ReactNode;
-  subTitle?: React.ReactNode;
+  valueFormat?: (value: string) => string | ReactJS.ReactNode;
+  subTitle?: ReactJS.ReactNode;
 }
 
-export default class Pie extends React.Component<IPieProps, any> {}
+export default class Pie extends ReactJS.Component<IPieProps, any> {}

@@ -1,6 +1,6 @@
-import * as React from 'react';
+import * as ReactJS from 'react';
 export interface IBarProps {
-  title: React.ReactNode;
+  title: ReactJS.ReactNode;
   color?: string;
   padding?: [number, number, number, number];
   height: number;
@@ -9,7 +9,7 @@ export interface IBarProps {
     y: number;
   }>;
   autoLabel?: boolean;
-  style?: React.CSSProperties;
+  style?: ReactJS.CSSProperties;
 }
 
-export default class Bar extends React.Component<IBarProps, any> {}
+export default class Bar extends ReactJS.Component<IBarProps, any> {}

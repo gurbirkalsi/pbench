@@ -1,8 +1,8 @@
-import * as React from 'react';
+import * as ReactJS from 'react';
 
 export interface ITagSelectOptionProps {
   value: string | number;
-  style?: React.CSSProperties;
+  style?: ReactJS.CSSProperties;
 }
 
-export default class TagSelectOption extends React.Component<ITagSelectOptionProps, any> {}
+export default class TagSelectOption extends ReactJS.Component<ITagSelectOptionProps, any> {}
