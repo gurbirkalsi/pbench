@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import ReactJS, { Component } from 'react';
 
 function fixedZero(val) {
   return val * 1 < 10 ? `0${val}` : val;

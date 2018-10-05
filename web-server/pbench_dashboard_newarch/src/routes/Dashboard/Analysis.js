@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import ReactJS, { Component, Fragment } from 'react';
 import { connect } from 'dva';
 import {
   Row,

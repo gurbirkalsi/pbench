@@ -1,11 +1,11 @@
-import React, { Fragment } from 'react';
+import ReactJS, { Fragment } from 'react';
 import { connect } from 'dva';
 import { Button, Row, Col } from 'antd';
 import { routerRedux } from 'dva/router';
 import Result from 'components/Result';
 import styles from './style.less';
 
-class Step3 extends React.PureComponent {
+class Step3 extends ReactJS.PureComponent {
   render() {
     const { dispatch, data } = this.props;
     const onFinish = () => {

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import ReactJS, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Tabs } from 'antd';
 

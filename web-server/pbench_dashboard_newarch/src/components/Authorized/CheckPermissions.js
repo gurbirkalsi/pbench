@@ -1,4 +1,4 @@
-import React from 'react';
+import ReactJS from 'react';
 import PromiseRender from 'components/Authorized/PromiseRender';
 import { CURRENT } from 'components/Authorized/renderAuthorize';
 

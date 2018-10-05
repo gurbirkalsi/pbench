@@ -1,9 +1,9 @@
-import * as React from 'react';
+import * as ReactJS from 'react';
 
-export default class Description extends React.Component<
+export default class Description extends ReactJS.Component<
   {
-    term: React.ReactNode;
-    style?: React.CSSProperties;
+    term: ReactJS.ReactNode;
+    style?: ReactJS.CSSProperties;
   },
   any
 > {}

@@ -1,4 +1,4 @@
-import React from 'react';
+import ReactJS from 'react';
 import { connect } from 'dva';
 import { routerRedux } from 'dva/router';
 import { Select, Card, Spin, Tag, Table, Button } from 'antd';
@@ -15,7 +15,7 @@ import cloneDeep from 'lodash/cloneDeep';
   endMonth: dashboard.endMonth,
   loading: loading.effects['dashboard/fetchIterations'],
 }))
-class CompareResults extends React.Component {
+class CompareResults extends ReactJS.Component {
   constructor(props) {
     super(props);
 

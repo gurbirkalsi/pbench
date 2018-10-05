@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import ReactJS, { PureComponent } from 'react';
 import { Popover, Icon, Tabs, Badge, Spin } from 'antd';
 import classNames from 'classnames';
 import List from 'components/NoticeIcon/NoticeList';
@@ -46,7 +46,7 @@ export default class NoticeIcon extends PureComponent {
     if (!children) {
       return null;
     }
-    const panes = React.Children.map(children, child => {
+    const panes = ReactJS.Children.map(children, child => {
       const title =
         child.props.list && child.props.list.length > 0
           ? `${child.props.title} (${child.props.list.length})`

@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import ReactJS, { PureComponent } from 'react';
 import { Layout, Menu, Icon } from 'antd';
 import pathToRegexp from 'path-to-regexp';
 import { Link } from 'dva/router';

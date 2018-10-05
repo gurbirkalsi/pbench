@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import ReactJS, { Component } from 'react';
 import { connect } from 'dva';
 import { Link } from 'dva/router';
 import { Checkbox, Alert, Icon } from 'antd';

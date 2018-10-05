@@ -1,7 +1,7 @@
-import React from 'react';
+import ReactJS from 'react';
 import { Spin } from 'antd';
 
-export default class PromiseRender extends React.PureComponent {
+export default class PromiseRender extends ReactJS.PureComponent {
   state = {
     component: null,
   };
@@ -37,7 +37,7 @@ export default class PromiseRender extends React.PureComponent {
   // Authorized  render is already instantiated, children is no instantiated
   // Secured is not instantiated
   checkIsInstantiation = target => {
-    if (!React.isValidElement(target)) {
+    if (!ReactJS.isValidElement(target)) {
       return target;
     }
     return () => target;

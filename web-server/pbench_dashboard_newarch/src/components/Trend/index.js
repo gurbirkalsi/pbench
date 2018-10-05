@@ -1,4 +1,4 @@
-import React from 'react';
+import ReactJS from 'react';
 import { Icon } from 'antd';
 import classNames from 'classnames';
 import styles from './index.less';

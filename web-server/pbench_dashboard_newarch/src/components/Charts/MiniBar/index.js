@@ -1,10 +1,10 @@
-import React from 'react';
+import ReactJS from 'react';
 import { Chart, Tooltip, Geom } from 'bizcharts';
 import autoHeight from 'components/Charts/autoHeight';
 import styles from '../index.less';
 
 @autoHeight()
-export default class MiniBar extends React.Component {
+export default class MiniBar extends ReactJS.Component {
   render() {
     const { height, forceFit = true, color = '#1890FF', data = [] } = this.props;
 

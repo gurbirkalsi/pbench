@@ -1,4 +1,4 @@
-import React, { createElement } from 'react';
+import ReactJS, { createElement } from 'react';
 import classNames from 'classnames';
 import { Button } from 'antd';
 import config from 'components/Exception/typeConfig';

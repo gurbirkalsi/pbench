@@ -1,4 +1,4 @@
-import React from 'react';
+import ReactJS from 'react';
 import { Input, Icon } from 'antd';
 import styles from './index.less';
 

@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import ReactJS, { Fragment } from 'react';
 import { Link, Redirect, Switch, Route } from 'dva/router';
 import DocumentTitle from 'react-document-title';
 import { Icon } from 'antd';
@@ -39,7 +39,7 @@ function getLoginPathWithRedirectPath() {
   });
 }
 
-class UserLayout extends React.PureComponent {
+class UserLayout extends ReactJS.PureComponent {
   getPageTitle() {
     const { routerData, location } = this.props;
     const { pathname } = location;

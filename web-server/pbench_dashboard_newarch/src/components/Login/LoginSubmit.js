@@ -1,4 +1,4 @@
-import React from 'react';
+import ReactJS from 'react';
 import classNames from 'classnames';
 import { Button, Form } from 'antd';
 import styles from './index.less';

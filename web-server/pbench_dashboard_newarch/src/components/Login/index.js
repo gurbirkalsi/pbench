@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import ReactJS, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Form, Tabs } from 'antd';
 import classNames from 'classnames';
@@ -91,7 +91,7 @@ class Login extends Component {
     const { type, tabs } = this.state;
     const TabChildren = [];
     const otherChildren = [];
-    React.Children.forEach(children, item => {
+    ReactJS.Children.forEach(children, item => {
       if (!item) {
         return;
       }

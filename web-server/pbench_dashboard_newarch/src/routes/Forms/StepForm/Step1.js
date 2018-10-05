@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import ReactJS, { Fragment } from 'react';
 import { connect } from 'dva';
 import { Form, Input, Button, Select, Divider } from 'antd';
 import { routerRedux } from 'dva/router';
@@ -16,7 +16,7 @@ const formItemLayout = {
 };
 
 @Form.create()
-class Step1 extends React.PureComponent {
+class Step1 extends ReactJS.PureComponent {
   render() {
     const { form, dispatch, data } = this.props;
     const { getFieldDecorator, validateFields } = form;

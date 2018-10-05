@@ -1,4 +1,4 @@
-import React from 'react';
+import ReactJS from 'react';
 import { Tooltip } from 'antd';
 
 import styles from './index.less';

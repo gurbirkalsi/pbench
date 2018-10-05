@@ -13,7 +13,7 @@ import { Alert, Checkbox } from 'antd';
 
 const { Tab, UserName, Password, Mobile, Captcha, Submit } = Login;
 
-class LoginDemo extends React.Component {
+class LoginDemo extends ReactJS.Component {
   state = {
     notice: '',
     type: 'tab2',

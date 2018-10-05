@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import ReactJS, { Component } from 'react';
 import { connect } from 'dva';
 import { routerRedux, Link } from 'dva/router';
 import { Form, Input, Button, Select, Row, Col, Popover, Progress } from 'antd';

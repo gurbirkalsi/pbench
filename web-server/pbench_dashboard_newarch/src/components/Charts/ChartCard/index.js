@@ -1,4 +1,4 @@
-import React from 'react';
+import ReactJS from 'react';
 import { Card } from 'antd';
 import classNames from 'classnames';
 

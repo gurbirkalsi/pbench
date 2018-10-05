@@ -1,4 +1,4 @@
-import React from 'react';
+import ReactJS from 'react';
 import { Link } from 'dva/router';
 import PageHeader from 'components/PageHeader';
 import styles from './PageHeaderLayout.less';

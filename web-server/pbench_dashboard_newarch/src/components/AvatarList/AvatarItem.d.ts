@@ -1,10 +1,10 @@
-import * as React from 'react';
+import * as ReactJS from 'react';
 export interface IAvatarItemProps {
-  tips: React.ReactNode;
+  tips: ReactJS.ReactNode;
   src: string;
-  style?: React.CSSProperties;
+  style?: ReactJS.CSSProperties;
 }
 
-export default class AvatarItem extends React.Component<IAvatarItemProps, any> {
+export default class AvatarItem extends ReactJS.Component<IAvatarItemProps, any> {
   constructor(props: IAvatarItemProps);
 }

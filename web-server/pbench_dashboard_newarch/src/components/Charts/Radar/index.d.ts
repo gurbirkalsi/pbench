@@ -1,6 +1,6 @@
-import * as React from 'react';
+import * as ReactJS from 'react';
 export interface IRadarProps {
-  title?: React.ReactNode;
+  title?: ReactJS.ReactNode;
   height: number;
   padding?: [number, number, number, number];
   hasLegend?: boolean;
@@ -9,7 +9,7 @@ export interface IRadarProps {
     label: string;
     value: string;
   }>;
-  style?: React.CSSProperties;
+  style?: ReactJS.CSSProperties;
 }
 
-export default class Radar extends React.Component<IRadarProps, any> {}
+export default class Radar extends ReactJS.Component<IRadarProps, any> {}

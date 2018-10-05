@@ -1,4 +1,4 @@
-import React from 'react';
+import ReactJS from 'react';
 import Exception from 'components/Exception';
 import CheckPermissions from 'components/Authorized/CheckPermissions';
 /**
@@ -12,7 +12,7 @@ const Exception403 = () => <Exception type="403" style={{ minHeight: 500, height
 // Authorized  render is already instantiated, children is no instantiated
 // Secured is not instantiated
 const checkIsInstantiation = target => {
-  if (!React.isValidElement(target)) {
+  if (!ReactJS.isValidElement(target)) {
     return target;
   }
   return () => target;

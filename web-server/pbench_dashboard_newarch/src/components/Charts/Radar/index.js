@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import ReactJS, { Component } from 'react';
 import { Chart, Tooltip, Geom, Coord, Axis } from 'bizcharts';
 import { Row, Col } from 'antd';
 import autoHeight from 'components/Charts/autoHeight';

@@ -1,5 +1,5 @@
 import 'rc-drawer/assets/index.css';
-import React from 'react';
+import ReactJS from 'react';
 import DrawerMenu from 'rc-drawer/lib';
 import SiderMenu from 'components/SiderMenu/SiderMenu';
 

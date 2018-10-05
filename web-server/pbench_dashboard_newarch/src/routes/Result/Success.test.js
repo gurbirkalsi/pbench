@@ -1,4 +1,4 @@
-import React from 'react';
+import ReactJS from 'react';
 import { shallow } from 'enzyme';
 import Success from './Success';
 

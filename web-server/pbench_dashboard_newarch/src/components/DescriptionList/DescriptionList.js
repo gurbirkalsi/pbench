@@ -1,4 +1,4 @@
-import React from 'react';
+import ReactJS from 'react';
 import classNames from 'classnames';
 import { Row } from 'antd';
 import styles from './index.less';
@@ -22,9 +22,9 @@ const DescriptionList = ({
     <div className={clsString} {...restProps}>
       {title ? <div className={styles.title}>{title}</div> : null}
       <Row gutter={gutter}>
-        {React.Children.map(
+        {ReactJS.Children.map(
           children,
-          child => (child ? React.cloneElement(child, { column }) : child)
+          child => (child ? ReactJS.cloneElement(child, { column }) : child)
         )}
       </Row>
     </div>
