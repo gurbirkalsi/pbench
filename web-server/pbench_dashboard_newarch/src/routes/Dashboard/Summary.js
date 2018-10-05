@@ -1,5 +1,7 @@
 import React from 'react';
 import { connect } from 'dva';
+import { routerRedux } from 'dva/router';
+import moment from 'moment';
 import { Select, Spin, Tag, Table, Button, Card } from 'antd';
 import axios from 'axios';
 import cloneDeep from 'lodash/cloneDeep';
@@ -20,6 +22,16 @@ const tabList = [
   },
 ];
 
+@connect(({ dashboard, loading }) => ({
+  selectedController: dashboard.selectedController,
+  selectedResults: dashboard.selectedResults,
+  iterations: dashboard.iterations,
+  summaryResult: dashboard.result,
+  results: dashboard.results,
+  startMonth: dashboard.startMonth,
+  endMonth: dashboard.endMonth,
+  controllers: dashboard.controllers,
+}))
 class Summary extends React.Component {
   constructor(props) {
     super(props);
@@ -42,40 +54,38 @@ class Summary extends React.Component {
 
   componentDidMount() {
     this.setState({ loading: true });
-    const { result, controller } = this.props.location.state;
-    axios
-      .get(
-        'http://es-perf44.perf.lab.eng.bos.redhat.com:9280/dsa.pbench.*/_search?source={ "query": { "match": { "run.name": "' +
-          result +
-          '" } }, "sort": "_index" }'
-      )
-      .then(res => {
-        var result = [];
-        result.push(res.data.hits.hits[0]);
-        this.setState({ summaryResult: result });
-      });
+    const { dispatch, startMonth, endMonth, selectedResults, selectedController } = this.props;
+
+    dispatch({
+      type: 'dashboard/fetchResult',
+      payload: {
+        startMonth: moment(startMonth),
+        endMonth: moment(endMonth),
+        result: selectedResults[0],
+      },
+    });
 
     var iterationEndpoint = '';
-    if (controller != null && controller.includes('.')) {
+    if (selectedController != null && selectedController.includes('.')) {
       iterationEndpoint =
         'http://pbench.perf.lab.eng.bos.redhat.com/results/' +
-        encodeURI(controller.slice(0, controller.indexOf('.'))) +
+        encodeURI(selectedController.slice(0, selectedController.indexOf('.'))) +
         '/' +
-        encodeURI(result) +
+        encodeURI(selectedResults[0]) +
         '/result.json';
     } else {
       iterationEndpoint =
         'http://pbench.perf.lab.eng.bos.redhat.com/results/' +
-        encodeURI(controller) +
+        encodeURI(selectedController) +
         '/' +
-        encodeURI(result) +
+        encodeURI(selectedResults[0]) +
         '/result.json';
     }
     axios
       .get(iterationEndpoint)
       .then(res => {
         const response = res.data;
-        const responseData = this.parseJSONData(response, result, controller);
+        const responseData = this.parseJSONData(response, selectedResults[0], selectedController);
         this.setState({ responseData: responseData });
         this.setState({ loading: false });
       })
@@ -83,31 +93,6 @@ class Summary extends React.Component {
         console.log(error);
         this.setState({ loading: false });
       });
-  }
-
-  retrieveResults(params) {
-    const { result, controller } = this.props.location.state;
-
-    history.push({
-      pathname:
-        '/dashboard/results/' +
-        controller.slice(0, controller.indexOf('.')) +
-        '/' +
-        result +
-        '/' +
-        params[1].iteration_number +
-        '-' +
-        params[1].iteration_name +
-        '/sample' +
-        params[0],
-      state: {
-        controllerName: params[1].controller_name,
-        resultName: params[1].result_name,
-        iterationNumber: params[1].iteration_number,
-        iterationName: params[1].iteration_name,
-        closestSample: params[1].closest_sample,
-      },
-    });
   }
 
   parseJSONData(response, resultName, controllerName) {
@@ -342,9 +327,7 @@ class Summary extends React.Component {
                             key: columnSample,
                             sorter: (a, b) => a[columnSample] - b[columnSample],
                             render: (text, record) => {
-                              return (
-                                <a onClick={() => this.retrieveResults([text, record])}>{text}</a>
-                              );
+                              return <a>{text}</a>;
                             },
                           },
                         ];
@@ -365,9 +348,7 @@ class Summary extends React.Component {
                           key: columnSample,
                           sorter: (a, b) => a[columnSample] - b[columnSample],
                           render: (text, record) => {
-                            return (
-                              <a onClick={() => this.retrieveResults([text, record])}>{text}</a>
-                            );
+                            return <a>{text}</a>;
                           },
                         });
                         iterationObject[columnSample] =
@@ -563,7 +544,6 @@ class Summary extends React.Component {
 
   render() {
     var {
-      summaryResult,
       responseData,
       loading,
       selectedConfig,
@@ -572,7 +552,7 @@ class Summary extends React.Component {
       configData,
       activeTab,
     } = this.state;
-    const { result, controller } = this.props.location.state;
+    const { selectedResults, summaryResult, selectedController } = this.props;
 
     var responseDataCopy = {};
     responseDataCopy['columns'] = cloneDeep(responseData.columns);
@@ -663,7 +643,6 @@ class Summary extends React.Component {
               style={{ marginTop: 16 }}
               columns={responseDataCopy.columns}
               dataSource={responseDataCopy.iterations}
-              onRowClick={this.retrieveResults.bind(this)}
               bordered
             />
           </Card>
@@ -771,10 +750,10 @@ class Summary extends React.Component {
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <div>
             <PageHeaderLayout
-              title={result}
+              title={selectedResults[0]}
               content={
-                <Tag color="blue" key={controller}>
-                  {'controller: ' + controller}
+                <Tag color="blue" key={selectedController}>
+                  {'controller: ' + selectedController}
                 </Tag>
               }
               tabList={tabList}

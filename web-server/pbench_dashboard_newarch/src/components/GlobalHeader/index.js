@@ -1,12 +1,20 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { routerRedux } from 'dva/router';
-import { Icon, Divider, Tooltip } from 'antd';
+import moment from 'moment';
+import { Icon, Divider, Tooltip, DatePicker, Button } from 'antd';
 import Debounce from 'lodash-decorators/debounce';
 import { Link } from 'dva/router';
 import HeaderSearch from 'components/HeaderSearch';
 import styles from './index.less';
 
+const { MonthPicker } = DatePicker;
+
+@connect(({ dashboard, routing, loading }) => ({
+  startMonth: dashboard.startMonth,
+  endMonth: dashboard.endMonth,
+  location: routing.location.pathname,
+}))
 class GlobalHeader extends PureComponent {
   componentWillUnmount() {
     this.triggerResizeEvent.cancel();
@@ -17,6 +25,34 @@ class GlobalHeader extends PureComponent {
     onCollapse(!collapsed);
     this.triggerResizeEvent();
   };
+
+  changeStartMonth = month => {
+    const { dispatch } = this.props;
+
+    dispatch({
+      type: 'dashboard/modifyControllerStartMonth',
+      payload: month.toString(),
+    });
+  };
+
+  changeEndMonth = month => {
+    const { dispatch } = this.props;
+
+    dispatch({
+      type: 'dashboard/modifyControllerEndMonth',
+      payload: month.toString(),
+    });
+  };
+
+  handleDateChange = () => {
+    const { dispatch, startMonth, endMonth } = this.props;
+
+    dispatch({
+      type: 'dashboard/fetchControllers',
+      payload: [moment(startMonth), moment(endMonth)],
+    });
+  };
+
   /* eslint-disable*/
   @Debounce(600)
   triggerResizeEvent() {
@@ -24,21 +60,55 @@ class GlobalHeader extends PureComponent {
     event.initEvent('resize', true, false);
     window.dispatchEvent(event);
   }
+
   render() {
-    const { collapsed, isMobile, logo, dispatch } = this.props;
+    const { collapsed, isMobile, logo, dispatch, startMonth, endMonth, location } = this.props;
+    console.log('header rendered');
+
     return (
       <div className={styles.header}>
-        {isMobile && [
-          <Link to="/" className={styles.logo} key="logo">
-            <img src={logo} alt="logo" width="32" />
-          </Link>,
-          <Divider type="vertical" key="line" />,
-        ]}
-        <Icon
-          className={styles.trigger}
-          type={collapsed ? 'menu-unfold' : 'menu-fold'}
-          onClick={this.toggle}
-        />
+        <div style={{ display: 'flex', flexDirection: 'row' }}>
+          {isMobile && [
+            <Link to="/" className={styles.logo} key="logo">
+              <img src={logo} alt="logo" width="32" />
+            </Link>,
+            <Divider type="vertical" key="line" />,
+          ]}
+          <Icon
+            className={styles.trigger}
+            type={collapsed ? 'menu-unfold' : 'menu-fold'}
+            onClick={this.toggle}
+          />
+          {location == '/dashboard/controllers' ? (
+            <div>
+              <MonthPicker
+                style={{ marginBottom: 16 }}
+                placeholder={'Start month'}
+                value={moment(startMonth)}
+                disabledDate={this.disabledDate}
+                onChange={this.changeStartMonth}
+                renderExtraFooter={() =>
+                  'Select the start month to adjust the time range for controllers to query.'
+                }
+              />
+              <MonthPicker
+                style={{ marginLeft: 16, marginRight: 8 }}
+                placeholder={'End month'}
+                value={moment(endMonth)}
+                disabledDate={this.disabledDate}
+                onChange={this.changeEndMonth}
+                renderExtraFooter={() =>
+                  'Select the end month to adjust the time range for controllers to query.'
+                }
+              />
+              <Button type="primary" onClick={this.handleDateChange}>
+                {'Filter'}
+              </Button>
+            </div>
+          ) : (
+            <div />
+          )}
+        </div>
         <div className={styles.right}>
           <HeaderSearch
             className={`${styles.action} ${styles.search}`}

@@ -1,3 +1,5 @@
+import { locationsAreEqual } from 'history';
+
 const config = {
   403: {
     img: 'https://gw.alipayobjects.com/zos/rmsportal/wZcnGqRDyhPOEYFcZDnb.svg',
@@ -12,7 +14,12 @@ const config = {
   500: {
     img: 'https://gw.alipayobjects.com/zos/rmsportal/RVRUAYdCGeYNBWoKiIwB.svg',
     title: '500',
-    desc: '抱歉，服务器出错了',
+    desc: "We're sorry, the Elasticsearch instance is currently down. Please try again later.",
+  },
+  503: {
+    img: 'https://gw.alipayobjects.com/zos/rmsportal/RVRUAYdCGeYNBWoKiIwB.svg',
+    title: '500',
+    desc: "We're sorry, the Elasticsearch instance is currently down. Please try again later.",
   },
 };
 

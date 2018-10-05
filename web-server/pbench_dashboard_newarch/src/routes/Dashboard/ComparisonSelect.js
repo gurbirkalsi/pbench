@@ -3,9 +3,18 @@ import { connect } from 'dva';
 import { routerRedux } from 'dva/router';
 import { Select, Card, Spin, Tag, Table, Button } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
-import axios from 'axios';
 import cloneDeep from 'lodash/cloneDeep';
 
+@connect(({ dashboard, loading }) => ({
+  selectedController: dashboard.selectedController,
+  selectedResults: dashboard.selectedResults,
+  iterations: dashboard.iterations,
+  results: dashboard.results,
+  controllers: dashboard.controllers,
+  startMonth: dashboard.startMonth,
+  endMonth: dashboard.endMonth,
+  loading: loading.effects['dashboard/fetchIterations'],
+}))
 class CompareResults extends React.Component {
   constructor(props) {
     super(props);
@@ -27,61 +36,28 @@ class CompareResults extends React.Component {
 
   componentDidMount() {
     this.setState({ loading: true });
-    const { results } = this.props.location.state;
-    var iterationRequests = [];
-    for (var result in results) {
-      if (results[result].controller.includes('.')) {
-        iterationRequests.push(
-          axios.get(
-            'http://pbench.perf.lab.eng.bos.redhat.com/results/' +
-              encodeURI(
-                results[result].controller.slice(0, results[result].controller.indexOf('.'))
-              ) +
-              '/' +
-              encodeURI(results[result].result) +
-              '/result.json'
+    const { dispatch, selectedResults, iterations } = this.props;
+
+    dispatch({
+      type: 'dashboard/fetchIterations',
+      payload: { selectedResults: selectedResults },
+    }).then(res => {
+      let selectedRowKeys = [];
+      let iterationData = [];
+      iterations.map(iteration => {
+        iterationData.push(
+          this.parseJSONData(
+            iteration.iterationData,
+            iteration.resultName,
+            iteration.controllerName,
+            iteration.tableId
           )
         );
-      } else {
-        iterationRequests.push(
-          axios.get(
-            'http://pbench.perf.lab.eng.bos.redhat.com/results/' +
-              encodeURI(results[result].controller) +
-              '/' +
-              encodeURI(results[result].result) +
-              '/result.json'
-          )
-        );
-      }
-    }
-    axios
-      .all(iterationRequests)
-      .then(args => {
-        var responseData = [];
-        var rowSelections = [];
-        var selectedRowKeys = this.state.selectedRowKeys;
-        for (var response in args) {
-          if (args[response].data != null) {
-            var iterationData = args[response].data;
-            var controllerName = args[response].config.url.split('/')[4];
-            var resultName = args[response].config.url.split('/')[5];
-            responseData.push(
-              this.parseJSONData(iterationData, resultName, controllerName, response)
-            );
-            selectedRowKeys.push([]);
-          }
-        }
-        this.setState({ selectedRowKeys: selectedRowKeys });
-        this.setState({ rowSelections: rowSelections });
-        this.setState({ responseData: responseData });
-        this.setState({ loading: false });
-      })
-      .catch(error => {
-        console.log(error);
-        if (error.response.status === 404) {
-          this.setState({ loading: false });
-        }
+        selectedRowKeys.push([]);
       });
+      this.setState({ responseData: iterationData });
+      this.setState({ selectedRowKeys: selectedRowKeys });
+    });
   }
 
   start = () => {
@@ -520,9 +496,21 @@ class CompareResults extends React.Component {
 
   compareIterations = params => {
     const { configData } = this.state;
-    const { results, controller } = this.props.location.state;
+    const { results, selectedController } = this.props;
     const { dispatch } = this.props;
     const configCategories = Object.keys(configData);
+
+    dispatch({
+      type: 'dashboard/modifyConfigCategories',
+      payload: configCategories,
+    });
+    dispatch({
+      type: 'dashboard/modifyConfigData',
+      payload: configData,
+    });
+    dispatch({
+      type: 'dashboard/modifySelectedResults',
+    });
 
     dispatch(
       routerRedux.push({
@@ -532,7 +520,7 @@ class CompareResults extends React.Component {
           configCategories: configCategories,
           configData: configData,
           results: results,
-          controller: controller,
+          controller: selectedController,
         },
       })
     );
@@ -540,9 +528,21 @@ class CompareResults extends React.Component {
 
   compareAllIterations = () => {
     const { responseDataAll, configData } = this.state;
-    const { results, controller } = this.props.location.state;
+    const { results, selectedController } = this.props;
     const { dispatch } = this.props;
     const configCategories = Object.keys(configData);
+
+    dispatch({
+      type: 'dashboard/modifyConfigCategories',
+      payload: configCategories,
+    });
+    dispatch({
+      type: 'dashboard/modifyConfigData',
+      payload: configData,
+    });
+    dispatch({
+      type: 'dashboard/modifySelectedResults',
+    });
 
     dispatch(
       routerRedux.push({
@@ -552,7 +552,7 @@ class CompareResults extends React.Component {
           configCategories: configCategories,
           configData: configData,
           results: results,
-          controller: controller,
+          controller: selectedController,
         },
       })
     );
@@ -580,7 +580,6 @@ class CompareResults extends React.Component {
   render() {
     const {
       responseData,
-      loading,
       loadingButton,
       selectedRowKeys,
       selectedPort,
@@ -588,7 +587,7 @@ class CompareResults extends React.Component {
       configData,
       selectedConfig,
     } = this.state;
-    const { controller } = this.props.location.state;
+    const { selectedController, loading } = this.props;
 
     var selectedRowNames = [];
     for (var item in selectedRowKeys) {
@@ -656,7 +655,7 @@ class CompareResults extends React.Component {
     }
 
     return (
-      <PageHeaderLayout title={controller}>
+      <PageHeaderLayout title={selectedController}>
         <Spin style={{ marginTop: 200, alignSelf: 'center' }} spinning={loading}>
           <Card style={{ marginBottom: 16 }}>
             {selectedRowNames.length > 0 ? (
@@ -669,7 +668,7 @@ class CompareResults extends React.Component {
                     disabled={selectedRowNames.length == 0}
                     loading={loadingButton}
                   >
-                    Compare Iterations
+                    {'Compare Iterations'}
                   </Button>
                 }
                 type="inner"
@@ -687,15 +686,15 @@ class CompareResults extends React.Component {
               onClick={this.compareAllIterations}
               loading={loadingButton}
             >
-              Compare All Iterations
+              {'Compare All Iterations'}
             </Button>
             <Button style={{ marginLeft: 8 }} onClick={this.clearFilters} loading={loadingButton}>
-              Clear Filters
+              {'Clear Filters'}
             </Button>
             <br />
             <Select
               allowClear={true}
-              placeholder="Filter Hostname & Port"
+              placeholder={'Filter Hostname & Port'}
               style={{ marginTop: 16, width: 160 }}
               onChange={this.portChange}
               value={selectedPort}

@@ -1,11 +1,13 @@
 import request from '../utils/request';
 import moment from 'moment';
+import axios from 'axios';
 
-export async function queryControllers(params) {
-  let startMonth = params[0];
-  let endMonth = params[1];
+const elasticsearch = 'http://elasticsearch.perf.lab.eng.bos.redhat.com:9280/';
+const production = 'http://pbench.perf.lab.eng.bos.redhat.com';
 
+function parseMonths(startMonth, endMonth) {
   let months = '';
+
   if (!startMonth.isBefore(endMonth)) {
     months = months.concat('dsa.pbench.run.' + startMonth.format('YYYY-MM') + ',');
   }
@@ -14,7 +16,13 @@ export async function queryControllers(params) {
     startMonth.add(1, 'month');
   }
 
-  const endpoint = 'http://elasticsearch.perf.lab.eng.bos.redhat.com:9280/' + months + '/_search';
+  return months;
+}
+
+export async function queryControllers(params) {
+  const { startMonth, endMonth } = params;
+
+  const endpoint = elasticsearch + parseMonths(startMonth, endMonth) + '/_search';
 
   return request(endpoint, {
     method: 'POST',
@@ -39,4 +47,83 @@ export async function queryControllers(params) {
       },
     },
   });
+}
+
+export async function queryResults(params) {
+  const { startMonth, endMonth, controller } = params;
+
+  const endpoint = elasticsearch + parseMonths(startMonth, endMonth) + '/_search';
+
+  return request(endpoint, {
+    method: 'POST',
+    body: {
+      fields: ['run.controller', 'run.start_run', 'run.end_run', 'run.name', 'run.config'],
+      sort: {
+        'run.end_run': {
+          order: 'desc',
+          ignore_unmapped: true,
+        },
+      },
+      query: {
+        term: {
+          'run.controller': controller,
+        },
+      },
+      size: 5000,
+    },
+  });
+}
+
+export async function queryResult(params) {
+  const { startMonth, endMonth, result } = params;
+
+  const endpoint = elasticsearch + parseMonths(startMonth, endMonth) + '/_search?source=';
+
+  return request(endpoint, {
+    method: 'POST',
+    body: {
+      query: {
+        match: {
+          'run.name': result,
+        },
+      },
+      sort: '_index',
+    },
+  });
+}
+
+export async function queryIterations(params) {
+  const { selectedResults } = params;
+
+  let iterationRequests = [];
+  selectedResults.map(result => {
+    if (result.controller.includes('.')) {
+      axios.get(
+        production +
+          '/results/' +
+          encodeURI(result.controller.slice(0, result.controller.indexOf('.'))) +
+          '/' +
+          encodeURI(result.result) +
+          '/result.json'
+      );
+    }
+    iterationRequests.push(
+      axios.get(
+        production +
+          '/results/' +
+          encodeURI(result.controller.slice(0, result.controller.indexOf('.'))) +
+          '/' +
+          encodeURI(result.result) +
+          '/result.json'
+      )
+    );
+  });
+
+  return Promise.all(iterationRequests)
+    .then(response => {
+      return response;
+    })
+    .catch(error => {
+      console.log(error);
+    });
 }
