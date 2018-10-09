@@ -95,7 +95,7 @@ export default class Results extends Component {
     this.setState({
       filtered: !!searchText,
       resultSearch: resultSearch
-        .map(record => {
+        .map((record, i) => {
           const match = record.result.match(reg);
           if (!match) {
             return null;
@@ -103,12 +103,12 @@ export default class Results extends Component {
           return {
             ...record,
             result: (
-              <span>
+              <span key={i}>
                 {record.result
                   .split(reg)
                   .map(
                     (text, i) =>
-                      i > 0 ? [<span style={{ color: 'orange' }}>{match[0]}</span>, text] : text
+                      i > 0 ? [<span key={i} style={{ color: 'orange' }}>{match[0]}</span>, text] : text
                   )}
               </span>
             ),
@@ -214,7 +214,7 @@ export default class Results extends Component {
               type="inner"
             >
               {selectedRowKeys.map((row, i) => (
-                <Tag id={row}>{results[row].result}</Tag>
+                <Tag key={i} id={row}>{results[row].result}</Tag>
               ))}
             </Card>
           ) : (
