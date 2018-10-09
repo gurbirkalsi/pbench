@@ -47,7 +47,7 @@ export default class Controllers extends Component {
     this.setState({
       filtered: !!searchText,
       controllerSearch: controllerSearch
-        .map(record => {
+        .map((record, i) => {
           const match = record.controller.match(reg);
           if (!match) {
             return null;
@@ -55,12 +55,12 @@ export default class Controllers extends Component {
           return {
             ...record,
             controller: (
-              <span>
+              <span key={i}>
                 {record.controller
                   .split(reg)
                   .map(
                     (text, i) =>
-                      i > 0 ? [<span style={{ color: 'orange' }}>{match[0]}</span>, text] : text
+                      i > 0 ? [<span key={i} style={{ color: 'orange' }}>{match[0]}</span>, text] : text
                   )}
               </span>
             ),

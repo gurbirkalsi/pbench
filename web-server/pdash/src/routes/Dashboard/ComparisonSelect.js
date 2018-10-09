@@ -41,7 +41,8 @@ class CompareResults extends ReactJS.Component {
     dispatch({
       type: 'dashboard/fetchIterations',
       payload: { selectedResults: selectedResults },
-    }).then(res => {
+    }).then((res) => {
+      console.log(res)
       let selectedRowKeys = [];
       let iterationData = [];
       iterations.map(iteration => {
@@ -59,16 +60,6 @@ class CompareResults extends ReactJS.Component {
       this.setState({ selectedRowKeys: selectedRowKeys });
     });
   }
-
-  start = () => {
-    this.setState({ loadingButton: true });
-    setTimeout(() => {
-      this.setState({
-        selectedRowKeys: [],
-        loadingButton: false,
-      });
-    }, 1000);
-  };
 
   openNotificationWithIcon = type => {
     notification[type]({
@@ -674,7 +665,7 @@ class CompareResults extends ReactJS.Component {
                 type="inner"
               >
                 {selectedRowNames.map((row, i) => (
-                  <Tag id={i}>{row}</Tag>
+                  <Tag key={i} id={i}>{row}</Tag>
                 ))}
               </div>
             ) : (
@@ -705,6 +696,7 @@ class CompareResults extends ReactJS.Component {
             </Select>
             {Object.keys(configData).map((category, i) => (
               <Select
+                key={i}
                 allowClear={true}
                 placeholder={category}
                 style={{ marginLeft: 8, width: 160 }}
@@ -712,7 +704,7 @@ class CompareResults extends ReactJS.Component {
                 onChange={value => this.configChange(value, category)}
               >
                 {configData[category].map((categoryData, i) => (
-                  <Select.Option value={categoryData}>{categoryData}</Select.Option>
+                  <Select.Option key={i} value={categoryData}>{categoryData}</Select.Option>
                 ))}
               </Select>
             ))}
@@ -726,7 +718,7 @@ class CompareResults extends ReactJS.Component {
               fixed: true,
             };
             return (
-              <Card style={{ marginBottom: 16 }}>
+              <Card key={i} style={{ marginBottom: 16 }}>
                 <h2>{response.resultName}</h2>
                 <Table
                   key={i}
