@@ -314,7 +314,7 @@ class RunComparison extends ReactJS.Component {
   }
 
   render() {
-    const { configCategories, results, controller } = this.props.location.state;
+    const { configCategories, controller, selectedResults } = this.props.location.state;
     const {
       graphKeys,
       tableData,
@@ -377,7 +377,7 @@ class RunComparison extends ReactJS.Component {
         <DescriptionList size="small" col="1" gutter={16}>
           <Description term="Controller">{<Tag>{controller}</Tag>}</Description>
           <Description term="Results">
-            {results.map(result => (
+            {selectedResults.map(result => (
               <Tag>{result.result}</Tag>
             ))}
           </Description>
