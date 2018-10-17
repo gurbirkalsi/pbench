@@ -99,10 +99,10 @@ class Summary extends ReactJS.Component {
     var responseData = [];
     var columns = [
       {
-        title: 'Iteration Number',
+        title: '#',
         dataIndex: 'iteration_number',
         fixed: 'left',
-        width: 75,
+        width: 50,
         key: 'iteration_number',
         sorter: (a, b) => a.iteration_number - b.iteration_number,
       },
