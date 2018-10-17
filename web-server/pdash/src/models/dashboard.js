@@ -177,7 +177,7 @@ export default {
     modifyConfigData(state, { payload }) {
       return {
         ...state,
-        configCategories: payload,
+        configData: payload,
       };
     },
   },
