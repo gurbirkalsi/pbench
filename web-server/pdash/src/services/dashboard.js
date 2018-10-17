@@ -96,34 +96,47 @@ export async function queryIterations(params) {
   const { selectedResults } = params;
 
   let iterationRequests = [];
-  selectedResults.map(result => {
-    if (result.controller.includes('.')) {
-      axios.get(
-        production +
-          '/results/' +
-          encodeURI(result.controller.slice(0, result.controller.indexOf('.'))) +
-          '/' +
-          encodeURI(result.result) +
-          '/result.json'
+  if (typeof params.selectedResults != undefined) {
+    selectedResults.map(result => {
+      if (result.controller.includes('.')) {
+        axios.get(
+          production +
+            '/results/' +
+            encodeURI(result.controller.slice(0, result.controller.indexOf('.'))) +
+            '/' +
+            encodeURI(result.result) +
+            '/result.json'
+        );
+      }
+      iterationRequests.push(
+        axios.get(
+          production +
+            '/results/' +
+            encodeURI(result.controller.slice(0, result.controller.indexOf('.'))) +
+            '/' +
+            encodeURI(result.result) +
+            '/result.json'
+        )
       );
-    }
-    iterationRequests.push(
-      axios.get(
-        production +
-          '/results/' +
-          encodeURI(result.controller.slice(0, result.controller.indexOf('.'))) +
-          '/' +
-          encodeURI(result.result) +
-          '/result.json'
-      )
-    );
-  });
-
-  return Promise.all(iterationRequests)
-    .then(response => {
-      return response;
-    })
-    .catch(error => {
-      console.log(error);
     });
+  
+    return Promise.all(iterationRequests)
+      .then(response => {
+  
+        let iterations = [];
+        response.map((iteration, index) => {
+          iterations.push({
+            iterationData: iteration.data,
+            controllerName: iteration.config.url.split('/')[4],
+            resultName: iteration.config.url.split('/')[5],
+            tableId: index,
+          });
+        });
+  
+        return iterations;
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
 }
