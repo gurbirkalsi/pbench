@@ -8,8 +8,8 @@ const production = 'http://pbench.perf.lab.eng.bos.redhat.com';
 function parseMonths(startMonth, endMonth) {
   let months = '';
 
-  if (!startMonth.isBefore(endMonth)) {
-    months = months.concat('dsa.pbench.run.' + startMonth.format('YYYY-MM') + ',');
+  if (endMonth.isBefore(moment().endOf('month'))) {
+    months = months.concat('dsa.pbench.run.' + endMonth.format('YYYY-MM') + ',');
   }
   while (startMonth.isBefore(endMonth) && startMonth.isBefore(moment().endOf('month'))) {
     months = months.concat('dsa.pbench.run.' + startMonth.format('YYYY-MM') + ',');
