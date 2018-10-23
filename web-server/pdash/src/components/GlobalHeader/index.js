@@ -49,7 +49,7 @@ class GlobalHeader extends PureComponent {
 
     dispatch({
       type: 'dashboard/fetchControllers',
-      payload: [moment(startMonth), moment(endMonth)],
+      payload: { startMonth: moment(startMonth), endMonth: moment(endMonth) },
     });
   };
 
