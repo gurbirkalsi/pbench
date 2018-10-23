@@ -2,14 +2,12 @@ import ReactJS from 'react';
 import { axios } from 'axios';
 import { connect } from 'dva';
 import { routerRedux } from 'dva/router';
-import { Select, Card, Spin, Tag, Table, Button } from 'antd';
+import { Select, Card, Spin, Tag, Table, Button, notification } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import cloneDeep from 'lodash/cloneDeep';
 import { parseIterationData } from '../../utils/parse';
 
-import {
-  queryIterations,
-} from '../../services/dashboard';
+import { queryIterations } from '../../services/dashboard';
 
 @connect(({ dashboard, loading }) => ({
   selectedController: dashboard.selectedController,
@@ -44,21 +42,32 @@ class ComparisonSelect extends ReactJS.Component {
     this.setState({ loading: true });
     const { selectedResults } = this.props;
 
-    queryIterations({selectedResults: selectedResults}).then((res) => {
-      let parsedIterationData = parseIterationData(res);
-      this.setState({ responseData: parsedIterationData.responseData });
-      this.setState({ selectedRowKeys: parsedIterationData.selectedRowKeys });
-      this.setState({ responseDataAll: parsedIterationData.responseDataAll });
-      this.setState({ configData: parsedIterationData.configData });
-      this.setState({ ports: parsedIterationData.ports });
-      this.setState({ loading: false });
-    });
+    queryIterations({ selectedResults: selectedResults })
+      .then(res => {
+        let parsedIterationData = parseIterationData(res);
+        this.setState({ responseData: parsedIterationData.responseData });
+        this.setState({ selectedRowKeys: parsedIterationData.selectedRowKeys });
+        this.setState({ responseDataAll: parsedIterationData.responseDataAll });
+        this.setState({ configData: parsedIterationData.configData });
+        this.setState({ ports: parsedIterationData.ports });
+        this.setState({ loading: false });
+      })
+      .catch(err => {
+        this.openNetworkErrorNotification('error');
+      });
   }
+
+  openNetworkErrorNotification = type => {
+    notification[type]({
+      message: 'Network Error',
+      description:
+        'There was a problem retrieving the iteration resources. Please try another result.',
+    });
+  };
 
   openNotificationWithIcon = type => {
     notification[type]({
       message: 'Please select two results for comparison.',
-      placement: 'bottomRight',
     });
   };
 
@@ -78,7 +87,7 @@ class ComparisonSelect extends ReactJS.Component {
     this.compareIterations(selectedRowData);
   };
 
-  onSelectChange = (record) => {
+  onSelectChange = record => {
     var { selectedRowKeys } = this.state;
     selectedRowKeys[record.table].push(record.key);
     this.setState({ selectedRowKeys });
@@ -100,7 +109,7 @@ class ComparisonSelect extends ReactJS.Component {
     });
     dispatch({
       type: 'dashboard/modifySelectedResults',
-      payload: selectedResults
+      payload: selectedResults,
     });
 
     dispatch(
@@ -112,7 +121,7 @@ class ComparisonSelect extends ReactJS.Component {
           configData: configData,
           results: results,
           controller: selectedController,
-          selectedResults: selectedResults
+          selectedResults: selectedResults,
         },
       })
     );
@@ -134,7 +143,7 @@ class ComparisonSelect extends ReactJS.Component {
     });
     dispatch({
       type: 'dashboard/modifySelectedResults',
-      payload: selectedResults
+      payload: selectedResults,
     });
 
     dispatch(
@@ -146,7 +155,7 @@ class ComparisonSelect extends ReactJS.Component {
           configData: configData,
           results: results,
           controller: selectedController,
-          selectedResults: selectedResults
+          selectedResults: selectedResults,
         },
       })
     );
@@ -269,7 +278,9 @@ class ComparisonSelect extends ReactJS.Component {
                 type="inner"
               >
                 {selectedRowNames.map((row, i) => (
-                  <Tag key={i} id={i}>{row}</Tag>
+                  <Tag key={i} id={i}>
+                    {row}
+                  </Tag>
                 ))}
               </div>
             ) : (
@@ -308,7 +319,9 @@ class ComparisonSelect extends ReactJS.Component {
                 onChange={value => this.configChange(value, category)}
               >
                 {configData[category].map((categoryData, i) => (
-                  <Select.Option key={i} value={categoryData}>{categoryData}</Select.Option>
+                  <Select.Option key={i} value={categoryData}>
+                    {categoryData}
+                  </Select.Option>
                 ))}
               </Select>
             ))}
@@ -316,8 +329,7 @@ class ComparisonSelect extends ReactJS.Component {
           {responseDataCopy.map((response, i) => {
             const rowSelection = {
               selectedRowKeys: selectedRowKeys[i],
-              onSelect: (record) =>
-                this.onSelectChange(record),
+              onSelect: record => this.onSelectChange(record),
               hideDefaultSelections: true,
               fixed: true,
             };
