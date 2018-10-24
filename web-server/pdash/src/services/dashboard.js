@@ -2,17 +2,21 @@ import request from '../utils/request';
 import moment from 'moment';
 import axios from 'axios';
 
-const elasticsearch = 'http://elasticsearch.perf.lab.eng.bos.redhat.com:9280/';
-const production = 'http://pbench.perf.lab.eng.bos.redhat.com';
+import storeConfig from '../../dist/datastore.json';
+
+const elasticsearch = storeConfig.elasticsearch;
+const production = storeConfig.production;
+const prefix = storeConfig.prefix;
+const runIndex = storeConfig.run_index;
 
 function parseMonths(startMonth, endMonth) {
   let months = '';
 
   if (endMonth.isBefore(moment().endOf('month'))) {
-    months = months.concat('dsa.pbench.run.' + endMonth.format('YYYY-MM') + ',');
+    months = months.concat(prefix + runIndex + endMonth.format('YYYY-MM') + ',');
   }
   while (startMonth.isBefore(endMonth) && startMonth.isBefore(moment().endOf('month'))) {
-    months = months.concat('dsa.pbench.run.' + startMonth.format('YYYY-MM') + ',');
+    months = months.concat(prefix + runIndex + startMonth.format('YYYY-MM') + ',');
     startMonth.add(1, 'month');
   }
 
@@ -119,10 +123,9 @@ export async function queryIterations(params) {
         )
       );
     });
-  
+
     return Promise.all(iterationRequests)
       .then(response => {
-  
         let iterations = [];
         response.map((iteration, index) => {
           iterations.push({
@@ -132,7 +135,7 @@ export async function queryIterations(params) {
             tableId: index,
           });
         });
-  
+
         return iterations;
       })
       .catch(error => {
