@@ -5,10 +5,11 @@ import moment from 'moment';
 import { Card, Table, Input, Button, Icon } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 
-@connect(({ dashboard, loading }) => ({
+@connect(({ global, dashboard, loading }) => ({
   controllers: dashboard.controllers,
   startMonth: dashboard.startMonth,
   endMonth: dashboard.endMonth,
+  datastoreConfig: global.datastoreConfig,
   loading: loading.effects['dashboard/fetchControllers'],
 }))
 export default class Controllers extends Component {
@@ -23,15 +24,27 @@ export default class Controllers extends Component {
   }
 
   componentDidMount() {
-    this.handleDateChange();
+    this.queryDatastoreConfig();
+  }
+
+  queryDatastoreConfig = () => {
+    const { dispatch } = this.props;
+    console.log(process.env.CONFIG)
+
+    dispatch({
+      type: 'global/fetchDatastoreConfig',
+      payload: process.env.CONFIG
+    }).then(() => {
+      this.handleDateChange();
+    })
   }
 
   handleDateChange = () => {
-    const { dispatch, startMonth, endMonth } = this.props;
+    const { dispatch, datastoreConfig, startMonth, endMonth } = this.props;
 
     dispatch({
       type: 'dashboard/fetchControllers',
-      payload: { startMonth: moment(startMonth), endMonth: moment(endMonth) },
+      payload: { datastoreConfig: datastoreConfig, startMonth: moment(startMonth), endMonth: moment(endMonth) },
     });
   };
 

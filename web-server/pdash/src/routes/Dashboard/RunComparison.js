@@ -259,6 +259,10 @@ class RunComparison extends ReactJS.Component {
     });
   }
 
+  convertJsonToCsv = () => {
+
+  }
+
   clusterDropdownChange = (value, primaryMetric) => {
     var { timeseriesDropdownSelected } = this.state;
     timeseriesDropdownSelected[primaryMetric] = value;
