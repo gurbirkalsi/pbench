@@ -9,7 +9,7 @@ import { parseIterationData } from '../../utils/parse';
 
 import { queryIterations } from '../../services/dashboard';
 
-@connect(({ dashboard, loading }) => ({
+@connect(({ global, dashboard, loading }) => ({
   selectedController: dashboard.selectedController,
   selectedResults: dashboard.selectedResults,
   iterations: dashboard.iterations,
@@ -17,6 +17,7 @@ import { queryIterations } from '../../services/dashboard';
   controllers: dashboard.controllers,
   startMonth: dashboard.startMonth,
   endMonth: dashboard.endMonth,
+  datastoreConfig: global.datastoreConfig,
   loading: loading.effects['dashboard/fetchIterations'],
 }))
 class ComparisonSelect extends ReactJS.Component {
@@ -40,9 +41,9 @@ class ComparisonSelect extends ReactJS.Component {
 
   componentDidMount() {
     this.setState({ loading: true });
-    const { selectedResults } = this.props;
+    const { selectedResults, datastoreConfig } = this.props;
 
-    queryIterations({ selectedResults: selectedResults })
+    queryIterations({ selectedResults: selectedResults, datastoreConfig: datastoreConfig })
       .then(res => {
         let parsedIterationData = parseIterationData(res);
         this.setState({ responseData: parsedIterationData.responseData });

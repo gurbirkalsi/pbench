@@ -22,7 +22,7 @@ const tabList = [
   },
 ];
 
-@connect(({ dashboard, loading }) => ({
+@connect(({ global, dashboard, loading }) => ({
   selectedController: dashboard.selectedController,
   selectedResults: dashboard.selectedResults,
   iterations: dashboard.iterations,
@@ -30,6 +30,7 @@ const tabList = [
   results: dashboard.results,
   startMonth: dashboard.startMonth,
   endMonth: dashboard.endMonth,
+  datastoreConfig: global.datastoreConfig,
   controllers: dashboard.controllers,
 }))
 class Summary extends ReactJS.Component {
@@ -54,11 +55,12 @@ class Summary extends ReactJS.Component {
 
   componentDidMount() {
     this.setState({ loading: true });
-    const { dispatch, startMonth, endMonth, selectedResults, selectedController } = this.props;
+    const { dispatch, datastoreConfig, startMonth, endMonth, selectedResults, selectedController } = this.props;
 
     dispatch({
       type: 'dashboard/fetchResult',
       payload: {
+        datastoreConfig: datastoreConfig,
         startMonth: moment(startMonth),
         endMonth: moment(endMonth),
         result: selectedResults[0],

@@ -5,11 +5,12 @@ import moment from 'moment';
 import { Tag, Card, Table, Input, Button } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 
-@connect(({ dashboard, loading }) => ({
+@connect(({ global, dashboard, loading }) => ({
   results: dashboard.results,
   selectedController: dashboard.selectedController,
   startMonth: dashboard.startMonth,
   endMonth: dashboard.endMonth,
+  datastoreConfig: global.datastoreConfig,
   loading: loading.effects['dashboard/fetchResults'],
 }))
 export default class Results extends Component {
@@ -28,11 +29,12 @@ export default class Results extends Component {
   }
 
   componentDidMount() {
-    const { dispatch, startMonth, endMonth, selectedController } = this.props;
+    const { dispatch, datastoreConfig, startMonth, endMonth, selectedController } = this.props;
 
     dispatch({
       type: 'dashboard/fetchResults',
       payload: {
+        datastoreConfig: datastoreConfig,
         startMonth: moment(startMonth),
         endMonth: moment(endMonth),
         controller: selectedController,
