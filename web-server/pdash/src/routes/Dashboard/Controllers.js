@@ -29,7 +29,6 @@ export default class Controllers extends Component {
 
   queryDatastoreConfig = () => {
     const { dispatch } = this.props;
-    console.log(process.env.CONFIG)
 
     dispatch({
       type: 'global/fetchDatastoreConfig',
