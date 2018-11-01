@@ -1,9 +1,6 @@
 const path = require('path');
 
 export default {
-  define: {
-    'process.env.CONFIG': process.env.CONFIG
-  },
   entry: 'src/index.js',
   extraBabelPlugins: [['import', { libraryName: 'antd', libraryDirectory: 'es', style: true }]],
   env: {
@@ -27,6 +24,6 @@ export default {
     javascriptEnabled: true,
   },
   disableDynamicImport: true,
-  publicPath: '/',
+  publicPath: '/pdashv2',
   hash: true,
 };
