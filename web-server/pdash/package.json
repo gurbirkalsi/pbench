@@ -1,7 +1,7 @@
 {
-  "name": "ant-design-pro",
-  "version": "1.3.0",
-  "description": "An out-of-box UI solution for enterprise applications",
+  "name": "PDash",
+  "version": "2.0.0",
+  "description": "UI solution for scalable visualization of benchmark data.",
   "private": true,
   "scripts": {
     "precommit": "npm run lint-staged",
@@ -34,6 +34,7 @@
     "dva": "^2.2.3",
     "dva-loading": "^2.0.3",
     "enquire-js": "^0.2.1",
+    "jschart": "^1.0.2",
     "lodash": "^4.17.10",
     "lodash-decorators": "^6.0.0",
     "moment": "^2.19.3",
