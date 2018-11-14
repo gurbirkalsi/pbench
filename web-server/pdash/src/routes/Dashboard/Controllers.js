@@ -2,7 +2,7 @@ import ReactJS, { Component } from 'react';
 import { connect } from 'dva';
 import { routerRedux } from 'dva/router';
 import moment from 'moment';
-import { Card, Table, Input, Button, Icon } from 'antd';
+import { Card, Table, Input, Button, Icon, Select } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 
 @connect(({ global, dashboard, loading }) => ({
@@ -41,6 +41,10 @@ export default class Controllers extends Component {
   handleDateChange = () => {
     const { dispatch, datastoreConfig, startMonth, endMonth } = this.props;
 
+    dispatch({
+      type: 'dashboard/fetchMonthIndices',
+      payload: { datastoreConfig: datastoreConfig }
+    })
     dispatch({
       type: 'dashboard/fetchControllers',
       payload: { datastoreConfig: datastoreConfig, startMonth: moment(startMonth), endMonth: moment(endMonth) },
