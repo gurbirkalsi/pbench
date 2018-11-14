@@ -20,6 +20,17 @@ function parseMonths(datastoreConfig, startMonth, endMonth) {
   return months;
 }
 
+export async function queryMonthIndices(params) {
+  const { datastoreConfig } = params;
+
+  const endpoint = 
+    datastoreConfig.elasticsearch + '/_cat/indices?format=json&pretty=true';
+
+  return request(endpoint, {
+    method: 'GET'
+  })
+}
+
 export async function queryControllers(params) {
   const { datastoreConfig, startMonth, endMonth } = params;
 

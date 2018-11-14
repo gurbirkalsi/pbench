@@ -1,18 +1,18 @@
-import ReactJS, { PureComponent } from 'react';
+import { PureComponent } from 'react';
 import { connect } from 'dva';
-import { routerRedux } from 'dva/router';
 import moment from 'moment';
-import { Icon, Divider, Tooltip, DatePicker, Button } from 'antd';
+import { Icon, Divider, Tooltip, DatePicker, Button, notification } from 'antd';
 import Debounce from 'lodash-decorators/debounce';
 import { Link } from 'dva/router';
-import HeaderSearch from 'components/HeaderSearch';
 import styles from './index.less';
 
 const { MonthPicker } = DatePicker;
 
-@connect(({ dashboard, routing, loading }) => ({
+@connect(({ global, dashboard, routing, loading }) => ({
   startMonth: dashboard.startMonth,
   endMonth: dashboard.endMonth,
+  indices: dashboard.indices,
+  datastoreConfig: global.datastoreConfig,
   location: routing.location.pathname,
 }))
 class GlobalHeader extends PureComponent {
@@ -26,32 +26,59 @@ class GlobalHeader extends PureComponent {
     this.triggerResizeEvent();
   };
 
-  changeStartMonth = month => {
-    const { dispatch } = this.props;
-
-    dispatch({
-      type: 'dashboard/modifyControllerStartMonth',
-      payload: month.toString(),
+  openErrorNotification = () => {
+    notification.error({
+      message: 'Index Unavailable',
+      description: 'This index does not contain any documents. Please select a different month.',
     });
+  }
+
+  changeStartMonth = month => {
+    const { dispatch, datastoreConfig, indices } = this.props;
+
+    if (indices.includes(datastoreConfig.run_index + datastoreConfig.prefix + month.format('YYYY-MM').toString())) {
+      dispatch({
+        type: 'dashboard/modifyControllerStartMonth',
+        payload: month.toString(),
+      });
+    } else {
+      this.openErrorNotification()
+    }
   };
 
   changeEndMonth = month => {
-    const { dispatch } = this.props;
+    const { dispatch, datastoreConfig, indices } = this.props;
 
-    dispatch({
-      type: 'dashboard/modifyControllerEndMonth',
-      payload: month.toString(),
-    });
+    if (indices.includes(datastoreConfig.run_index + datastoreConfig.prefix + month.format('YYYY-MM').toString())) {
+      dispatch({
+        type: 'dashboard/modifyControllerEndMonth',
+        payload: month.toString(),
+      });
+    } else {
+      this.openErrorNotification()
+    }
   };
 
   handleDateChange = () => {
-    const { dispatch, startMonth, endMonth } = this.props;
+    const { dispatch, datastoreConfig, startMonth, endMonth } = this.props;
 
     dispatch({
       type: 'dashboard/fetchControllers',
-      payload: { startMonth: moment(startMonth), endMonth: moment(endMonth) },
+      payload: { datastoreConfig: datastoreConfig, startMonth: moment(startMonth), endMonth: moment(endMonth) },
     });
   };
+
+  disabledStartMonth = (current) => {
+    const { endMonth } = this.props;
+
+    return current && current > moment(endMonth);
+  }
+
+  disabledEndMonth = (current) => {
+    const { startMonth } = this.props;
+
+    return current && current < moment(startMonth); 
+  }
 
   /* eslint-disable*/
   @Debounce(600)
@@ -85,8 +112,9 @@ class GlobalHeader extends PureComponent {
                 style={{ marginBottom: 16 }}
                 placeholder={'Start month'}
                 value={moment(startMonth)}
-                disabledDate={this.disabledDate}
+                disabledDate={this.disabledStartMonth}
                 onChange={this.changeStartMonth}
+                allowClear={false}
                 renderExtraFooter={() =>
                   'Select the start month to adjust the time range for controllers to query.'
                 }
@@ -95,8 +123,9 @@ class GlobalHeader extends PureComponent {
                 style={{ marginLeft: 16, marginRight: 8 }}
                 placeholder={'End month'}
                 value={moment(endMonth)}
-                disabledDate={this.disabledDate}
+                disabledDate={this.disabledEndMonth}
                 onChange={this.changeEndMonth}
+                allowClear={false}
                 renderExtraFooter={() =>
                   'Select the end month to adjust the time range for controllers to query.'
                 }
@@ -110,20 +139,6 @@ class GlobalHeader extends PureComponent {
           )}
         </div>
         <div className={styles.right}>
-          <HeaderSearch
-            className={`${styles.action} ${styles.search}`}
-            placeholder="Search controllers and results"
-            onPressEnter={value => {
-              dispatch(
-                routerRedux.push({
-                  pathname: '/search',
-                  state: {
-                    query: value,
-                  },
-                })
-              );
-            }}
-          />
           <Tooltip title="Help">
             <a
               target="_blank"
