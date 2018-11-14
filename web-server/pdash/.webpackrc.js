@@ -24,6 +24,6 @@ export default {
     javascriptEnabled: true,
   },
   disableDynamicImport: true,
-  publicPath: '/pdashv2',
+  publicPath: '/pdashv2/',
   hash: true,
 };
