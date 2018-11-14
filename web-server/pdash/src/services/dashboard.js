@@ -7,12 +7,12 @@ function parseMonths(datastoreConfig, startMonth, endMonth) {
 
   if (endMonth.isBefore(moment().endOf('month'))) {
     months = months.concat(
-      ',' + datastoreConfig.run_index + datastoreConfig.prefix + endMonth.format('YYYY-MM') + ','
+      ',' + datastoreConfig.prefix + datastoreConfig.run_index + endMonth.format('YYYY-MM') + ','
     );
   }
   while (startMonth.isBefore(endMonth) && startMonth.isBefore(moment().endOf('month'))) {
     months = months.concat(
-      ',' + datastoreConfig.run_index + datastoreConfig.prefix + startMonth.format('YYYY-MM') + ','
+      ',' + datastoreConfig.prefix + datastoreConfig.run_index + startMonth.format('YYYY-MM') + ','
     );
     startMonth.add(1, 'month');
   }

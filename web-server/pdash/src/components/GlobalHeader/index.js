@@ -1,7 +1,7 @@
 import { PureComponent } from 'react';
 import { connect } from 'dva';
 import moment from 'moment';
-import { Icon, Divider, Tooltip, DatePicker, Button, notification } from 'antd';
+import { Icon, Divider, Tooltip, DatePicker, Button, notification, Spin } from 'antd';
 import Debounce from 'lodash-decorators/debounce';
 import { Link } from 'dva/router';
 import styles from './index.less';
@@ -36,7 +36,7 @@ class GlobalHeader extends PureComponent {
   changeStartMonth = month => {
     const { dispatch, datastoreConfig, indices } = this.props;
 
-    if (indices.includes(datastoreConfig.run_index + datastoreConfig.prefix + month.format('YYYY-MM').toString())) {
+    if (indices.includes(datastoreConfig.prefix + datastoreConfig.run_index + month.format('YYYY-MM').toString())) {
       dispatch({
         type: 'dashboard/modifyControllerStartMonth',
         payload: month.toString(),
@@ -49,7 +49,7 @@ class GlobalHeader extends PureComponent {
   changeEndMonth = month => {
     const { dispatch, datastoreConfig, indices } = this.props;
 
-    if (indices.includes(datastoreConfig.run_index + datastoreConfig.prefix + month.format('YYYY-MM').toString())) {
+    if (indices.includes(datastoreConfig.prefix + datastoreConfig.run_index + month.format('YYYY-MM').toString())) {
       dispatch({
         type: 'dashboard/modifyControllerEndMonth',
         payload: month.toString(),
@@ -89,7 +89,7 @@ class GlobalHeader extends PureComponent {
   }
 
   render() {
-    const { collapsed, isMobile, logo, dispatch, startMonth, endMonth, location } = this.props;
+    const { collapsed, isMobile, logo, indices, startMonth, endMonth, location } = this.props;
     console.log('header rendered');
 
     return (
@@ -107,33 +107,35 @@ class GlobalHeader extends PureComponent {
             onClick={this.toggle}
           />
           {location == '/dashboard/controllers' ? (
-            <div>
-              <MonthPicker
-                style={{ marginBottom: 16 }}
-                placeholder={'Start month'}
-                value={moment(startMonth)}
-                disabledDate={this.disabledStartMonth}
-                onChange={this.changeStartMonth}
-                allowClear={false}
-                renderExtraFooter={() =>
-                  'Select the start month to adjust the time range for controllers to query.'
-                }
-              />
-              <MonthPicker
-                style={{ marginLeft: 16, marginRight: 8 }}
-                placeholder={'End month'}
-                value={moment(endMonth)}
-                disabledDate={this.disabledEndMonth}
-                onChange={this.changeEndMonth}
-                allowClear={false}
-                renderExtraFooter={() =>
-                  'Select the end month to adjust the time range for controllers to query.'
-                }
-              />
-              <Button type="primary" onClick={this.handleDateChange}>
-                {'Filter'}
-              </Button>
-            </div>
+            <Spin spinning={indices.length == 0}>
+              <div>
+                <MonthPicker
+                  style={{ marginBottom: 16 }}
+                  placeholder={'Start month'}
+                  value={moment(startMonth)}
+                  disabledDate={this.disabledStartMonth}
+                  onChange={this.changeStartMonth}
+                  allowClear={false}
+                  renderExtraFooter={() =>
+                    'Select the start month to adjust the time range for controllers to query.'
+                  }
+                />
+                <MonthPicker
+                  style={{ marginLeft: 16, marginRight: 8 }}
+                  placeholder={'End month'}
+                  value={moment(endMonth)}
+                  disabledDate={this.disabledEndMonth}
+                  onChange={this.changeEndMonth}
+                  allowClear={false}
+                  renderExtraFooter={() =>
+                    'Select the end month to adjust the time range for controllers to query.'
+                  }
+                />
+                <Button type="primary" onClick={this.handleDateChange}>
+                  {'Filter'}
+                </Button>
+              </div>
+            </Spin>
           ) : (
             <div />
           )}

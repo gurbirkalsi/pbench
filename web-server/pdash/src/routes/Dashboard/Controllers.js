@@ -10,7 +10,9 @@ import PageHeaderLayout from '../../layouts/PageHeaderLayout';
   startMonth: dashboard.startMonth,
   endMonth: dashboard.endMonth,
   datastoreConfig: global.datastoreConfig,
-  loading: loading.effects['dashboard/fetchControllers'],
+  loadingControllers: loading.effects['dashboard/fetchControllers'],
+  loadingIndices: loading.effects['dashboard/fetchMonthIndices'],
+  loadingConfig: loading.effects['global/fetchDatastoreConfig']
 }))
 export default class Controllers extends Component {
   constructor(props) {
@@ -44,11 +46,12 @@ export default class Controllers extends Component {
     dispatch({
       type: 'dashboard/fetchMonthIndices',
       payload: { datastoreConfig: datastoreConfig }
+    }).then(() => {
+      dispatch({
+        type: 'dashboard/fetchControllers',
+        payload: { datastoreConfig: datastoreConfig, startMonth: moment(startMonth), endMonth: moment(endMonth) },
+      });
     })
-    dispatch({
-      type: 'dashboard/fetchControllers',
-      payload: { datastoreConfig: datastoreConfig, startMonth: moment(startMonth), endMonth: moment(endMonth) },
-    });
   };
 
   onInputChange = e => {
@@ -109,7 +112,7 @@ export default class Controllers extends Component {
 
   render() {
     const { controllerSearch, searchText } = this.state;
-    const { controllers, loading } = this.props;
+    const { controllers, loadingControllers, loadingConfig, loadingIndices } = this.props;
     const suffix = searchText ? <Icon type="close-circle" onClick={this.emitEmpty} /> : null;
     const columns = [
       {
@@ -158,7 +161,7 @@ export default class Controllers extends Component {
             dataSource={controllerSearch.length > 0 ? controllerSearch : controllers}
             defaultPageSize={20}
             onRowClick={this.retrieveResults.bind(this)}
-            loading={loading}
+            loading={loadingControllers || loadingConfig || loadingIndices}
             showSizeChanger={true}
             showTotal={true}
             bordered
