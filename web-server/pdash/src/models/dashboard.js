@@ -1,4 +1,5 @@
 import {
+  queryMonthIndices,
   queryControllers,
   queryResults,
   queryResult,
@@ -14,6 +15,7 @@ export default {
 
   state: {
     controller: '',
+    indices: [],
     result: [],
     results: [],
     configCategories: [],
@@ -28,6 +30,21 @@ export default {
   },
 
   effects: {
+    *fetchMonthIndices({ payload }, { call, put }) {
+      let response = yield call(queryMonthIndices, payload);
+
+      let indices = [];
+      response.map(index => {
+        if (index.index.includes("dsa.pbench.run")) {
+          indices.push(index.index);
+        }
+      })
+
+      yield put({ 
+        type: 'getMonthIndices',
+        payload: indices
+      });
+    },
     *fetchControllers({ payload }, { call, put }) {
       let response = yield call(queryControllers, payload);
 
@@ -120,6 +137,12 @@ export default {
   },
 
   reducers: {
+    getMonthIndices(state, { payload }) {
+      return {
+        ...state,
+        indices: payload
+      }
+    },
     getControllers(state, { payload }) {
       return {
         ...state,
