@@ -62,7 +62,7 @@ export const parseIterationData = (results) => {
     results.map(result => {
       let resultName = result.resultName;
       let controllerName = result.controllerName;
-      let table = result.Id;
+      let table = result.tableId;
 
       var responseData = [];
       var iterations = [];
