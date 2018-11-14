@@ -90,7 +90,11 @@ class ComparisonSelect extends ReactJS.Component {
 
   onSelectChange = record => {
     var { selectedRowKeys } = this.state;
-    selectedRowKeys[record.table].push(record.key);
+    if (selectedRowKeys[record.table].includes(record.key)) {
+      selectedRowKeys[record.table].splice(selectedRowKeys[record.table].indexOf(record.key), 1);
+    } else {
+      selectedRowKeys[record.table].push(record.key);
+    }
     this.setState({ selectedRowKeys });
   };
 
@@ -263,69 +267,81 @@ class ComparisonSelect extends ReactJS.Component {
       <PageHeaderLayout title={selectedController}>
         <Spin style={{ marginTop: 200, alignSelf: 'center' }} spinning={loading}>
           <Card style={{ marginBottom: 16 }}>
-            {selectedRowNames.length > 0 ? (
-              <div
-                style={{ marginTop: 16 }}
-                title={
+            <Card
+              type="inner"
+              title={<h3 style={{marginTop: 8}}>{'Selected Iterations'}</h3>}
+              extra={
+                <div>
+                  <Button
+                    type="primary"
+                    style={{ marginRight: 8 }}
+                    onClick={this.compareAllIterations}
+                    loading={loadingButton}
+                  >
+                    {'Compare All Iterations'}
+                  </Button>
                   <Button
                     type="primary"
                     onClick={this.onCompareIterations}
                     disabled={selectedRowNames.length == 0}
                     loading={loadingButton}
                   >
-                    {'Compare Iterations'}
+                    {'Compare Selected Iterations'}
                   </Button>
-                }
-                type="inner"
-              >
-                {selectedRowNames.map((row, i) => (
-                  <Tag key={i} id={i}>
-                    {row}
-                  </Tag>
+                </div>
+              }
+            > 
+              {selectedRowNames.length > 0 ?
+                <div>
+                  {selectedRowNames.map((row, i) => (
+                    <Tag style={{fontSize: 16}} key={i} id={i}>
+                      {row}
+                    </Tag>
+                  ))}
+                </div>
+                :
+                <Card.Meta
+                  description="Start by comparing all iterations or selecting specific iterations from the result tables below."
+                />
+              }
+            </Card>
+            <Card
+              type="inner"
+              title={<h3 style={{marginTop: 8}}>{'Iteration Filters'}</h3>}
+              style={{ marginTop: 16 }}
+              extra={
+                <Button style={{ marginLeft: 8 }} type="primary" onClick={this.clearFilters} loading={loadingButton}>
+                  {'Clear Filters'}
+                </Button>
+              }>
+                {/*<Select
+                  allowClear={true}
+                  placeholder={'Filter Hostname & Port'}
+                  style={{ marginTop: 16, width: 160 }}
+                  onChange={this.portChange}
+                  value={selectedPort}
+                >
+                  {ports.map((port, i) => (
+                    <Select.Option value={port}>{port}</Select.Option>
+                  ))}
+                  </Select>*/}
+                {Object.keys(configData).map((category, i) => (
+                  <Select
+                    key={i}
+                    allowClear={true}
+                    placeholder={category}
+                    style={{ marginLeft: 8, width: 160 }}
+                    value={selectedConfig[category]}
+                    onChange={value => this.configChange(value, category)}
+                  >
+                    {configData[category].map((categoryData, i) => (
+                      <Select.Option key={i} value={categoryData}>
+                        {categoryData}
+                      </Select.Option>
+                    ))}
+                  </Select>
                 ))}
-              </div>
-            ) : (
-              <div />
-            )}
-            <Button
-              type="primary"
-              style={{ alignSelf: 'flex-start' }}
-              onClick={this.compareAllIterations}
-              loading={loadingButton}
-            >
-              {'Compare All Iterations'}
-            </Button>
-            <Button style={{ marginLeft: 8 }} onClick={this.clearFilters} loading={loadingButton}>
-              {'Clear Filters'}
-            </Button>
-            <br />
-            <Select
-              allowClear={true}
-              placeholder={'Filter Hostname & Port'}
-              style={{ marginTop: 16, width: 160 }}
-              onChange={this.portChange}
-              value={selectedPort}
-            >
-              {ports.map((port, i) => (
-                <Select.Option value={port}>{port}</Select.Option>
-              ))}
-            </Select>
-            {Object.keys(configData).map((category, i) => (
-              <Select
-                key={i}
-                allowClear={true}
-                placeholder={category}
-                style={{ marginLeft: 8, width: 160 }}
-                value={selectedConfig[category]}
-                onChange={value => this.configChange(value, category)}
-              >
-                {configData[category].map((categoryData, i) => (
-                  <Select.Option key={i} value={categoryData}>
-                    {categoryData}
-                  </Select.Option>
-                ))}
-              </Select>
-            ))}
+            </Card>
           </Card>
           {responseDataCopy.map((response, i) => {
             const rowSelection = {

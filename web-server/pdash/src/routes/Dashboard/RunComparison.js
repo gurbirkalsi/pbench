@@ -386,7 +386,6 @@ class RunComparison extends ReactJS.Component {
               <Select
                 addonBefore="Cluster Parameters"
                 mode="tags"
-                size={'large'}
                 placeholder="Select cluster config"
                 value={selectedConfig}
                 defaultValue={configCategories}
