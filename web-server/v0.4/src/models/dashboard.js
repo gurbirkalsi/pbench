@@ -5,8 +5,8 @@ import {
   queryTocResult,
   queryIterations,
   queryTimeseriesData,
+  querySharedConfig,
 } from '../services/dashboard';
-
 import { parseIterationData } from '../utils/parse';
 import { insertTocTreeData } from '../utils/utils';
 
@@ -106,7 +106,8 @@ export default {
     *fetchResult({ payload }, { call, put }) {
       const response = yield call(queryResult, payload);
       // eslint-disable-next-line no-underscore-dangle
-      const result = typeof response.hits.hits[0] !== 'undefined' ? response.hits.hits[0]._source : [];
+      const result =
+        typeof response.hits.hits[0] !== 'undefined' ? response.hits.hits[0]._source : [];
       let metadataTag = '';
       const parsedResult = {};
 
@@ -118,13 +119,13 @@ export default {
 
       parsedResult.runMetadata = {
         ...result.run,
-        ...result[metadataTag]
-      }
+        ...result[metadataTag],
+      };
 
       parsedResult.hostTools = [];
       result.host_tools_info.forEach(toolData => {
         parsedResult.hostTools.push(toolData);
-      })
+      });
 
       yield put({
         type: 'getResult',
@@ -156,6 +157,16 @@ export default {
         payload: tocTree,
       });
     },
+    *fetchSharedConfig({ payload }, { call, put }) {
+      let response = yield call(querySharedConfig, payload);
+      const config = JSON.parse(response.data.data.url.config);
+      const { description } = response.data.data.url;
+      response = { config, description };
+      yield put({
+        type: 'getSharedConfig',
+        payload: response,
+      });
+    },
     *fetchIterations({ payload }, { call, put }) {
       const response = yield call(queryIterations, payload);
       const parsedIterationData = parseIterationData(response);
@@ -164,17 +175,17 @@ export default {
         type: 'getIterations',
         payload: {
           iterations: parsedIterationData.iterations,
-          iterationParams: parsedIterationData.iterationParams
+          iterationParams: parsedIterationData.iterationParams,
         },
       });
       yield put({
-        type: 'global/modifySelectedIterationKeys', 
-        payload: parsedIterationData.selectedIterationKeys
-      })
+        type: 'global/modifySelectedIterationKeys',
+        payload: parsedIterationData.selectedIterationKeys,
+      });
     },
     *fetchTimeseriesData({ payload }, { call }) {
       const response = yield call(queryTimeseriesData, payload);
-      
+
       return response;
     },
     *updateConfigCategories({ payload }, { put }) {
@@ -214,6 +225,11 @@ export default {
       return {
         ...state,
         tocResult: payload,
+      };
+    },
+    getSharedConfig(state, { payload }) {
+      return {
+        payload,
       };
     },
     getIterations(state, { payload }) {

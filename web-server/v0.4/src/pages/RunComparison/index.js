@@ -101,8 +101,8 @@ class RunComparison extends React.Component {
       exportModalVisible: false,
       defaultComponents: ['details', 'summary', 'table', 'timeseries'],
       selectedComponents: [],
-      pdfHeader: '',
-      pdfName: '',
+      pdfHeader: ' ',
+      pdfName: ' ',
     };
   }
 
@@ -301,7 +301,7 @@ class RunComparison extends React.Component {
     const expandedRowRender = cluster => {
       const expandedColumns = [
         {
-          title: 'iteration_name',
+          title: 'iteration_names',
           dataIndex: 'iteration_name',
           key: 'iteration_name',
         },
@@ -409,16 +409,28 @@ class RunComparison extends React.Component {
           <Card type="inner" title="Render Options">
             <Form layout="inline">
               <Form.Item colon={false} label="Details">
-                <Switch defaultChecked onSelectPageSection={() => this.onSelectPageSection('details')} />
+                <Switch
+                  defaultChecked
+                  onSelectPageSection={() => this.onSelectPageSection('details')}
+                />
               </Form.Item>
               <Form.Item colon={false} label="Summary Graphs">
-                <Switch defaultChecked onSelectPageSection={() => this.onSelectPageSection('summary')} />
+                <Switch
+                  defaultChecked
+                  onSelectPageSection={() => this.onSelectPageSection('summary')}
+                />
               </Form.Item>
               <Form.Item colon={false} label="Timeseries Graphs">
-                <Switch defaultChecked onSelectPageSection={() => this.onSelectPageSection('timeseries')} />
+                <Switch
+                  defaultChecked
+                  onSelectPageSection={() => this.onSelectPageSection('timeseries')}
+                />
               </Form.Item>
               <Form.Item colon={false} label="Cluster Tables">
-                <Switch defaultChecked onSelectPageSection={() => this.onSelectPageSection('table')} />
+                <Switch
+                  defaultChecked
+                  onSelectPageSection={() => this.onSelectPageSection('table')}
+                />
               </Form.Item>
             </Form>
           </Card>
@@ -557,7 +569,7 @@ class RunComparison extends React.Component {
                               defaultValue={`Cluster ${0}`}
                               style={{ width: 120, marginLeft: 16 }}
                               value={timeseriesDropdownSelected[table]}
-                              onChange={value => this.onTimeseriesClusterChange(value, table)}
+                              onChange={value => this.clusterDropdownChange(value, table)}
                             >
                               {timeseriesDropdown[table].map(cluster => (
                                 <Select.Option value={cluster}>
