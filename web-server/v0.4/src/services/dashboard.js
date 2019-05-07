@@ -128,12 +128,12 @@ export async function querySharedConfig(params) {
     method: 'post',
     data: {
       query: `
-              query($id: ID!) {
-                  url(where: {id: $id}) {
-                      config
-                      description
-                  }
-                  }`,
+        query($id: ID!) {
+            url(where: {id: $id}) {
+                config
+                description
+            }
+      }`,
       variables: {
         id,
       },
