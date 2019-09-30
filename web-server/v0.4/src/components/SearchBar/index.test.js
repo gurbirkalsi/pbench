@@ -1,6 +1,6 @@
 import React from 'react';
 import { shallow, mount } from 'enzyme';
-import { Input, Icon } from 'antd';
+import { Input } from 'antd';
 import SearchBar from './index';
 
 const { Search } = Input;
@@ -17,6 +17,7 @@ const mockProps = {
 
 const mockDispatch = jest.fn();
 const wrapper = shallow(<SearchBar dispatch={mockDispatch} {...mockProps} />);
+const mountedWrapper = mount(<SearchBar dispatch={mockDispatch} {...mockProps} />);
 
 describe('test rendering of TableFilterSelection page component', () => {
   it('render with empty props', () => {
@@ -28,6 +29,10 @@ describe('test rendering of TableFilterSelection page component', () => {
 });
 
 describe('test interaction of SearchBar page component', () => {
+  it('render with empty props', () => {
+    expect(mountedWrapper.find(Search)).toHaveLength(1);
+    expect(mountedWrapper.instance().searchBar).toBeTruthy();
+  });
   it('changes search value', () => {
     wrapper
       .find(Search)
@@ -49,10 +54,15 @@ describe('test interaction of SearchBar page component', () => {
     wrapper.setState({ searchValue: 'abc' });
     expect(wrapper.find(Search).props().suffix.props).not.toBe({});
   });
-  it('click on empty icon', () => {
-    const emitEmpty = jest.spyOn(wrapper.instance(), 'emitEmpty');
-    const click = mount(<Icon type="close-circle" onClick={emitEmpty} label="test" />);
-    click.find(Icon).prop('onClick')();
-    expect(emitEmpty).toHaveBeenCalled();
+  it('should clear user inputted search value', () => {
+    mountedWrapper.setState({ searchValue: 'test ' });
+    expect(
+      mountedWrapper
+        .find('Icon')
+        .at(1)
+        .prop('type')
+    ).toEqual('close-circle');
+    const icon = mountedWrapper.find('Icon').at(1);
+    icon.simulate('click');
   });
 });
