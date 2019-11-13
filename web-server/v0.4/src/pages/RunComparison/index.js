@@ -5,7 +5,6 @@ import {
   Col,
   Card,
   Select,
-  Tabs,
   Spin,
   Tag,
   Table,
@@ -15,67 +14,26 @@ import {
   Input,
   Switch,
   message,
-  Collapse,
-  Icon,
+  Descriptions,
 } from 'antd';
 import { ResponsiveBar } from '@nivo/bar';
-import DescriptionList from 'ant-design-pro/lib/DescriptionList';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
-import { generateIterationClusters, getComparisonColumn } from '../../utils/parse';
+import { generateIterationClusters } from '../../utils/parse';
 import TimeseriesGraph from '@/components/TimeseriesGraph';
 
-const { Description } = DescriptionList;
-const { TabPane } = Tabs;
 const FormItem = Form.Item;
-const { Panel } = Collapse;
 
-const columns = [
+const tabList = [
   {
-    title: 'Cluster ID',
-    dataIndex: 'clusterID',
-    key: 'clusterID',
+    key: 'summary',
+    tab: 'Summary',
   },
   {
-    title: 'Matched Configurations',
-    dataIndex: 'cluster',
-    render: text => {
-      const splitTags = text.split('-');
-      return splitTags.map(tag => (
-        <Tag color="#2db7f5" key={tag}>
-          {tag}
-        </Tag>
-      ));
-    },
-    key: 'cluster',
-  },
-  {
-    title: 'Iterations',
-    dataIndex: 'length',
-    key: 'length',
-  },
-];
-
-const legendColumns = [
-  {
-    title: 'Cluster ID',
-    dataIndex: 'clusterID',
-    key: 'clusterID',
-  },
-  {
-    title: 'Matched Configurations',
-    dataIndex: 'cluster',
-    render: text => {
-      const splitTags = text.split('-');
-      return splitTags.map(tag => (
-        <Tag color="#2db7f5" key={tag}>
-          {tag}
-        </Tag>
-      ));
-    },
-    key: 'cluster',
+    key: 'timeseries',
+    tab: 'Timeseries',
   },
 ];
 
@@ -106,7 +64,8 @@ class RunComparison extends React.Component {
       selectedComponents: [],
       pdfHeader: '',
       pdfName: '',
-      column: [],
+      activeSummaryTab: 'summary',
+      activeClusterTab: 'Gb_sec',
     };
   }
 
@@ -134,10 +93,6 @@ class RunComparison extends React.Component {
         this.setState({ loadingClusters: false });
         this.setState({
           ...timeseriesData,
-        });
-        const column = getComparisonColumn(iterationClusters.maxIterationLength);
-        this.setState({
-          column,
         });
       });
     });
@@ -242,6 +197,14 @@ class RunComparison extends React.Component {
     );
   };
 
+  onTabChange = key => {
+    this.setState({ activeSummaryTab: key });
+  };
+
+  onClusterChange = key => {
+    this.setState({ activeClusterTab: key });
+  };
+
   onSelectPageSection = id => {
     const { defaultComponents } = this.state;
 
@@ -270,66 +233,41 @@ class RunComparison extends React.Component {
       loadingPdf,
       exportModalVisible,
       loadingClusters,
-      column,
+      activeSummaryTab,
+      activeClusterTab,
     } = this.state;
     const { selectedControllers, selectedResults, iterationParams } = this.props;
 
-    const expandedRowRender = cluster => {
-      const expandedColumns = [
-        {
-          title: 'iteration_name',
-          dataIndex: 'iteration_name',
-          key: 'iteration_name',
-        },
-        {
-          title: 'result_name',
-          dataIndex: 'result_name',
-          width: 250,
-          key: 'result_name',
-        },
-        {
-          title: 'iteration_number',
-          dataIndex: 'iteration_number',
-          key: 'iteration_number',
-        },
-      ];
+    const legendColumns = [
+      {
+        title: 'cluster ID',
+        dataIndex: 'clusterID',
+        key: 'clusterID',
+      },
+    ];
 
-      Object.keys(iterationParams).forEach(config => {
-        expandedColumns.push({
-          title: iterationParams[config],
-          dataIndex: iterationParams[config],
-          key: iterationParams[config],
-        });
+    Object.keys(iterationParams).forEach(config => {
+      legendColumns.push({
+        title: config,
+        dataIndex: config,
+        key: config,
       });
-      expandedColumns.push({
-        title: 'closestSample',
-        dataIndex: 'closestSample',
-        key: 'closestSample',
-      });
-
-      return (
-        <Table
-          columns={expandedColumns}
-          dataSource={clusteredIterations[cluster.primaryMetric][cluster.key]}
-          pagination={false}
-        />
-      );
-    };
+    });
 
     const description = (
-      <DescriptionList size="small" col="1" gutter={16}>
-        <Description term="Controllers">
-          {selectedControllers.map(controller => (
-            <Tag key={controller}>{controller}</Tag>
-          ))}
-        </Description>
-        <Description term="Results">
-          {selectedResults.map(result => (
-            <Tag key={result}>{result['run.name']}</Tag>
-          ))}
-        </Description>
-        <Description term="Clustering Config">
-          <div>
+      <div>
+        <Descriptions bordered>
+          <Descriptions.Item label="Selected Controllers">
+            {selectedControllers.join(',')}
+          </Descriptions.Item>
+          <Descriptions.Item label="Selected Results">
+            {selectedResults.map(result => (
+              <Tag key={result}>{result['run.name']}</Tag>
+            ))}
+          </Descriptions.Item>
+        </Descriptions>
+        <Descriptions bordered style={{ marginTop: 16 }}>
+          <Descriptions.Item label="Clustering Config">
             <Select
               addonBefore="Cluster Parameters"
               mode="tags"
@@ -344,17 +282,21 @@ class RunComparison extends React.Component {
                 </Select.Option>
               ))}
             </Select>
-            <Button type="primary" onClick={this.resetIterationClusters} style={{ marginLeft: 8 }}>
+            <Button
+              type="primary"
+              onClick={this.onResetIterationClusters}
+              style={{ marginLeft: 8 }}
+            >
               Reset
             </Button>
-          </div>
-        </Description>
-      </DescriptionList>
+          </Descriptions.Item>
+        </Descriptions>
+      </div>
     );
 
     const action = (
       <div>
-        <Button type="primary" onClick={this.showExportModal}>
+        <Button style={{}} type="primary" onClick={this.showExportModal}>
           Export
         </Button>
       </div>
@@ -414,200 +356,194 @@ class RunComparison extends React.Component {
       </Modal>
     );
 
+    const clusterTabList = [];
+    Object.keys(clusteredGraphData).forEach(cluster => {
+      clusterTabList.push({
+        key: cluster,
+        tab: cluster,
+      });
+    });
+
+    const clusterTabContent = [];
+    // eslint-disable-next-line array-callback-return
+    Object.keys(clusteredGraphData).map(cluster => {
+      clusterTabContent[cluster] = (
+        <div>
+          <Row style={{ marginTop: 16 }}>
+            <Col xl={16} lg={12} md={12} sm={24} xs={24} style={{ height: 500 }}>
+              <ResponsiveBar
+                data={clusteredGraphData[cluster]}
+                keys={graphKeys[cluster]}
+                indexBy="cluster"
+                groupMode="grouped"
+                padding={0.3}
+                width={1500}
+                labelSkipWidth={18}
+                labelSkipHeight={18}
+                tooltip={({ id, index, value }) => (
+                  <div style={{ backgroundColor: 'white', color: 'grey' }}>
+                    <Row>
+                      <Col>Result</Col>
+                      <Col>{clusteredIterations[cluster][index][id].result_name}</Col>
+                    </Row>
+                    <br />
+                    <Row>
+                      <Col>Iteration</Col>
+                      <Col>{clusteredIterations[cluster][index][id].iteration_name}</Col>
+                    </Row>
+                    <br />
+                    <Row>
+                      <Col>Mean</Col>
+                      <Col>{value}</Col>
+                    </Row>
+                    <br />
+                    <Row>
+                      <Col>Matched Configurations</Col>
+                      <Col>
+                        <div>
+                          {tableData[cluster][index].cluster
+                            .split('-')
+                            .map(
+                              tag => (tag.length > 0 ? <Tag color="#2db7f5">{tag}</Tag> : <div />)
+                            )}
+                        </div>
+                      </Col>
+                    </Row>
+                  </div>
+                )}
+                borderColor="inherit:darker(1.6)"
+                margin={{
+                  top: 32,
+                  left: 64,
+                  bottom: 64,
+                  right: 32,
+                }}
+                axisLeft={{
+                  orient: 'left',
+                  tickSize: 5,
+                  tickPadding: 5,
+                  tickRotation: 0,
+                  legend: 'mean',
+                  legendPosition: 'center',
+                  legendOffset: -40,
+                }}
+                axisBottom={{
+                  orient: 'bottom',
+                  tickSize: 5,
+                  tickPadding: 5,
+                  tickRotation: 0,
+                  legend: 'cluster ID',
+                  legendPosition: 'center',
+                  legendOffset: 36,
+                }}
+                labelTextColor="inherit:darker(1.6)"
+                theme={{
+                  tooltip: {
+                    container: {
+                      background: 'white',
+                      fontSize: '13px',
+                    },
+                  },
+                  labels: {
+                    textColor: '#555',
+                  },
+                }}
+              />
+            </Col>
+          </Row>
+          <Table
+            style={{ marginTop: 16 }}
+            size="small"
+            columns={legendColumns}
+            dataSource={tableData[cluster]}
+          />
+        </div>
+      );
+    });
+
+    const contentList = {
+      summary: (
+        <Spin spinning={loadingClusters}>
+          <Card
+            type="inner"
+            style={{ marginBottom: 16 }}
+            tabList={clusterTabList}
+            activeTabKey={activeClusterTab}
+            onTabChange={key => {
+              this.onClusterChange(key);
+            }}
+          >
+            {clusterTabContent[activeClusterTab]}
+          </Card>
+        </Spin>
+      ),
+      timeseries: (
+        <div>
+          {Object.keys(timeseriesData).length > 0 &&
+            Object.keys(timeseriesDropdown).length > 0 && (
+              <div id="timeseries">
+                {Object.keys(tableData).map(table => (
+                  <Card
+                    type="inner"
+                    title={table}
+                    style={{ marginBottom: 16 }}
+                    extra={
+                      <Form layout="inline">
+                        <FormItem
+                          label="Selected Cluster"
+                          colon={false}
+                          style={{ marginLeft: 16, fontWeight: '500' }}
+                        >
+                          <Select
+                            defaultValue={`Cluster ${0}`}
+                            style={{ width: 120, marginLeft: 16 }}
+                            value={timeseriesDropdownSelected[table]}
+                            onChange={value => this.onTimeseriesClusterChange(value, table)}
+                          >
+                            {timeseriesDropdown[table].map(cluster => (
+                              <Select.Option value={cluster}>{`Cluster ${cluster}`}</Select.Option>
+                            ))}
+                          </Select>
+                        </FormItem>
+                      </Form>
+                    }
+                  >
+                    <TimeseriesGraph
+                      key={table}
+                      graphId={table}
+                      graphName={table}
+                      data={timeseriesData[table][timeseriesDropdownSelected[table]][0].data}
+                      dataSeriesNames={
+                        timeseriesData[table][timeseriesDropdownSelected[table]][0]
+                          .data_series_names
+                      }
+                      xAxisSeries={
+                        timeseriesData[table][timeseriesDropdownSelected[table]][0].x_axis_series
+                      }
+                    />
+                  </Card>
+                ))}
+              </div>
+            )}
+        </div>
+      ),
+    };
+
     return (
       <div id="all">
         <div id="details">
-          <PageHeaderLayout title="Run Comparison Details" content={description} action={action} />
+          <PageHeaderLayout
+            title="Run Comparison"
+            content={description}
+            action={action}
+            tabList={tabList}
+            tabActiveKey={activeSummaryTab}
+            onTabChange={this.onTabChange}
+          >
+            {contentList[activeSummaryTab]}
+          </PageHeaderLayout>
         </div>
         {exportModal}
-        <br />
-        <Card bordered bodyStyle={{ padding: 4 }} id="summary">
-          <Tabs size="large">
-            <TabPane tab="Summary" key="summary" style={{ padding: 16 }}>
-              <Spin spinning={loadingClusters}>
-                {Object.keys(clusteredGraphData).map(cluster => (
-                  <div>
-                    <Row style={{ marginTop: 16 }}>
-                      <Col xl={16} lg={12} md={12} sm={24} xs={24} style={{ height: 500 }}>
-                        <h4 style={{ marginLeft: 16 }}>{cluster}</h4>
-                        <ResponsiveBar
-                          data={clusteredGraphData[cluster]}
-                          keys={graphKeys[cluster]}
-                          indexBy="cluster"
-                          groupMode="grouped"
-                          padding={0.3}
-                          labelSkipWidth={18}
-                          labelSkipHeight={18}
-                          tooltip={({ id, index, value }) => (
-                            <div style={{ backgroundColor: 'white', color: 'grey' }}>
-                              <Row>
-                                <Col>Result</Col>
-                                <Col>{clusteredIterations[cluster][index][id].result_name}</Col>
-                              </Row>
-                              <br />
-                              <Row>
-                                <Col>Iteration</Col>
-                                <Col>{clusteredIterations[cluster][index][id].iteration_name}</Col>
-                              </Row>
-                              <br />
-                              <Row>
-                                <Col>Mean</Col>
-                                <Col>{value}</Col>
-                              </Row>
-                              <br />
-                              <Row>
-                                <Col>Matched Configurations</Col>
-                                <Col>
-                                  <div>
-                                    {tableData[cluster][index].cluster.split('-').map(tag => (
-                                      <Tag color="#2db7f5">{tag}</Tag>
-                                    ))}
-                                  </div>
-                                </Col>
-                              </Row>
-                            </div>
-                          )}
-                          borderColor="inherit:darker(1.6)"
-                          margin={{
-                            top: 32,
-                            left: 64,
-                            bottom: 64,
-                            right: 124,
-                          }}
-                          axisLeft={{
-                            orient: 'left',
-                            tickSize: 5,
-                            tickPadding: 5,
-                            tickRotation: 0,
-                            legend: 'mean',
-                            legendPosition: 'center',
-                            legendOffset: -40,
-                          }}
-                          axisBottom={{
-                            orient: 'bottom',
-                            tickSize: 5,
-                            tickPadding: 5,
-                            tickRotation: 0,
-                            legend: 'cluster ID',
-                            legendPosition: 'center',
-                            legendOffset: 36,
-                          }}
-                          labelTextColor="inherit:darker(1.6)"
-                          theme={{
-                            tooltip: {
-                              container: {
-                                background: 'white',
-                                fontSize: '13px',
-                              },
-                            },
-                            labels: {
-                              textColor: '#555',
-                            },
-                          }}
-                        />
-                      </Col>
-                      <Col xl={8} lg={12} md={12} sm={24} xs={24}>
-                        <Table
-                          size="small"
-                          columns={legendColumns}
-                          dataSource={tableData[cluster]}
-                        />
-                      </Col>
-                    </Row>
-                    <Collapse
-                      bordered
-                      defaultActiveKey={['1']}
-                      expandIcon={({ isActive }) => (
-                        <Icon type="caret-right" rotate={isActive ? 90 : 0} />
-                      )}
-                    >
-                      <Panel header="Percent Differences Table" key="1">
-                        <Table
-                          columns={column}
-                          dataSource={clusteredGraphData[cluster]}
-                          pagination={{ pageSize: 50 }}
-                          scroll={{ x: 1500, y: 240 }}
-                          bordered
-                        />
-                      </Panel>
-                    </Collapse>
-                    <br
-                      style={{
-                        borderTopWidth: 3,
-                        borderStyle: 'solid',
-                        borderColor: '#8c8b8b',
-                      }}
-                    />
-                  </div>
-                ))}
-              </Spin>
-            </TabPane>
-            <TabPane forceRender tab="All" key="all" style={{ padding: 16 }}>
-              {Object.keys(timeseriesData).length > 0 &&
-                Object.keys(timeseriesDropdown).length > 0 && (
-                  <div id="timeseries">
-                    {Object.keys(tableData).map(table => (
-                      <Card
-                        type="inner"
-                        title={table}
-                        style={{ marginBottom: 16 }}
-                        extra={
-                          <Form layout="inline">
-                            <FormItem
-                              label="Selected Cluster"
-                              colon={false}
-                              style={{ marginLeft: 16, fontWeight: '500' }}
-                            >
-                              <Select
-                                defaultValue={`Cluster ${0}`}
-                                style={{ width: 120, marginLeft: 16 }}
-                                value={timeseriesDropdownSelected[table]}
-                                onChange={value => this.onTimeseriesClusterChange(value, table)}
-                              >
-                                {timeseriesDropdown[table].map(cluster => (
-                                  <Select.Option value={cluster}>
-                                    {`Cluster ${cluster}`}
-                                  </Select.Option>
-                                ))}
-                              </Select>
-                            </FormItem>
-                          </Form>
-                        }
-                      >
-                        <TimeseriesGraph
-                          key={table}
-                          graphId={table}
-                          graphName={table}
-                          data={timeseriesData[table][timeseriesDropdownSelected[table]][0].data}
-                          dataSeriesNames={
-                            timeseriesData[table][timeseriesDropdownSelected[table]][0]
-                              .data_series_names
-                          }
-                          xAxisSeries={
-                            timeseriesData[table][timeseriesDropdownSelected[table]][0]
-                              .x_axis_series
-                          }
-                        />
-                      </Card>
-                    ))}
-                  </div>
-                )}
-            </TabPane>
-          </Tabs>
-        </Card>
-        <br />
-        <Card title="Cluster Tables" id="table">
-          {Object.keys(tableData).map(table => (
-            <Table
-              bordered
-              title={() => <h4>{table}</h4>}
-              columns={columns}
-              dataSource={tableData[table]}
-              expandedRowRender={expandedRowRender}
-              pagination={{ pageSize: 20 }}
-            />
-          ))}
-        </Card>
       </div>
     );
   }

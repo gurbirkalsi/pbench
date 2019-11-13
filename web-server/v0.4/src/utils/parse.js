@@ -285,7 +285,12 @@ export const filterIterationColumns = (results, selectedPorts) => {
   return resultsCopy;
 };
 
-export const parseClusteredIterations = (clusteredIterations, clusterLabels, selectedConfig) => {
+export const parseClusteredIterations = (
+  clusteredIterations,
+  clusterLabels,
+  clusterData,
+  selectedConfig
+) => {
   const clusteredGraphData = [];
   const graphKeys = [];
   const tableData = [];
@@ -333,6 +338,7 @@ export const parseClusteredIterations = (clusteredIterations, clusterLabels, sel
         key: cluster,
         clusterID: cluster,
         cluster: clusterLabels[primaryMetric][cluster],
+        ...clusterData[primaryMetric][cluster],
         primaryMetric,
         length: clusterItems,
       });
@@ -353,16 +359,20 @@ export const parseClusteredIterations = (clusteredIterations, clusterLabels, sel
 
 export const groupClusters = (array, cluster, f) => {
   const groups = {};
+  const clusters = [];
 
   array.forEach(o => {
-    const group = f(o).join('-');
+    const res = f(o);
+    const group = res.data.join('-');
     groups[group] = groups[group] || [];
     groups[group].push(o);
+    clusters.push(res.obj);
   });
 
   return {
     clusterLabels: Object.keys(groups),
     cluster: Object.keys(groups).map(group => groups[group]),
+    clusters,
   };
 };
 
@@ -370,6 +380,7 @@ export const generateIterationClusters = (config, iterations) => {
   let primaryMetricIterations = [];
   let clusteredIterations = [];
   const clusterLabels = [];
+  const clusterData = [];
   const selectedConfig = config;
 
   primaryMetricIterations = _.mapValues(_.groupBy(iterations, 'primary_metric'), clist =>
@@ -381,10 +392,17 @@ export const generateIterationClusters = (config, iterations) => {
     if (typeof config === 'object' && config.length > 0) {
       clusteredIterations = groupClusters(primaryMetricIterations[cluster], cluster, item => {
         const configData = [];
+        const configObj = {};
         config.forEach(filter => {
-          configData.push(item[filter]);
+          if (typeof item[filter] !== 'undefined') {
+            configData.push(item[filter]);
+            configObj[filter] = item[filter];
+          }
         });
-        return configData;
+        return {
+          data: configData,
+          obj: configObj,
+        };
       });
     } else {
       clusteredIterations = _.mapValues(
@@ -394,9 +412,15 @@ export const generateIterationClusters = (config, iterations) => {
     }
     primaryMetricIterations[cluster] = clusteredIterations.cluster;
     clusterLabels[cluster] = clusteredIterations.clusterLabels;
+    clusterData[cluster] = clusteredIterations.clusters;
   });
 
-  return parseClusteredIterations(primaryMetricIterations, clusterLabels, selectedConfig);
+  return parseClusteredIterations(
+    primaryMetricIterations,
+    clusterLabels,
+    clusterData,
+    selectedConfig
+  );
 };
 
 export const getComparisonColumn = maxIterationLength => {
